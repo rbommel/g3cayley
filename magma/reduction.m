@@ -13,7 +13,7 @@
 
 import "verbose.m" : MyBenchIndent, MyBenchStart, MyBenchStop;
 import "stabletypes.m" : AllTypes, OctadDiagrams;
-import "loctad.m" : NormaliseOctad, IntegralOctad;
+import "loctad.m" : NormaliseOctad;
 
 
 intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
@@ -151,12 +151,12 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
             tt := MyBenchStart(1, "its integral normalization");
             try
                 indent := GetVerbose("G3CayleyIndents");
-                CreOctad := IntegralOctad(CreOctad);
+                CreOctad := NormaliseOctad(CreOctad);
             catch e
                 Prec *:= 2; onerr := true;
                 SetVerbose("G3CayleyIndents", indent);
                 vprintf G3Cayley, 1:
-                    "%o!!! An error catched in IntegralOctad(), let us restart at precision %o...\n",
+                    "%o!!! An error catched in NormaliseOctad(), let us restart at precision %o...\n",
                     MyBenchIndent(""), Prec;
             end try;
             MyBenchStop(1, "Its integral normalization", tt);

@@ -724,11 +724,6 @@ function pAdicValuation(x)
     return Integers()!v;
 end function;
 
-function IsIntegralOctad(O)
-    if Min([pAdicValuation(o[i]) : o in O, i in [1..4]]) lt 0 then return false; end if;
-    return true;
-end function;
-
 function NormaliseValuation(v)
 	m := Min([pAdicValuation(v[j]) : j in [1..4]]);
 	return [ ShiftValuation(e, -m) : e in Eltseq(v) ];
@@ -742,18 +737,6 @@ function NormaliseOctad(OL)
     O2 := Matrix(OL) * N^(-1);
     O3 := [ NormaliseValuation(O2[i]) : i in [1..8] ];
     return O3, N;
-
-end function;
-
-function IntegralOctad(O)
-
-    for L in [ [i : i in S] cat [i : i in [1..8] | not(i in S)] : S in Subsets({1..8},5)] do
-        O1 := NormaliseOctad(O[L]);
-        if IsIntegralOctad(O1) then return O1; end if;
-    end for;
-
-    assert(false);
-    return [];
 
 end function;
 
