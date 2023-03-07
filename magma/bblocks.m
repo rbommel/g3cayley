@@ -37,6 +37,12 @@ KeySets := [
 
 V70 := VectorSpace(Rationals(), 70);
 
+// The space E3
+V8 := VectorSpace(GF(2), 8);
+W8 := sub< V8 | [V8.1 + V8.i : i in [2..8]] >;
+E3, rho := quo< W8 | [ W8!&+[V8.i : i in [1..8]] ] >;
+E3_M := hom<E3->E3 | Matrix([ [ &+[GF(2)!Min(Integers()!v1[k], Integers()!v2[k]) : k in [1..8] ] where v1 := (E3.i @@ rho) where v2 := (E3.j @@ rho) : i in [1..6] ] : j in [1..6] ])>;
+
 intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
     { On input of a Cayley octad, this function returns its 70-dimensional plucker vector and its corresponding ordered 4-partitions of \{1..8\} }
 
@@ -288,6 +294,34 @@ function CayleyBuildingBlocks()
         [ Tw,  Pl,  TA, TB,  CA, CB, CC,  Ln ],
         W;
 
+end function;
+
+function AssociatedSubspace(T)
+
+    if T[1] eq "Tw" then
+        return sub< E3 | [rho(&+[V8.i : i in T[2]])] >;
+    elif T[1] eq "Pl" then
+        return sub< E3 | [rho(&+[V8.i : i in p]) : p in T[2]] >;
+    elif T[1] eq "TA" then
+        return sub< E3 | [rho(V8.s + &+[V8.i : i in t]) : s in T[2][1], t in T[2][2]] >;
+    elif T[1] eq "TB" then
+        return sub< E3 | [rho(&+[V8.i : i in p]) : p in Subsets(T[2], 2)] >;
+    elif T[1] eq "CA" then
+        q1 := [ q : q in T[2] | 1 in &join q ][1];
+        q2 := [ q : q in T[2] | q ne q1 ][1];
+        p11, p12 := Explode([ p : p in q1 ]);
+        p21, p22 := Explode([ p : p in q2 ]);
+        return sub< E3 | [ rho(&+[V8.i : i in p11]), rho(&+[V8.i : i in p12]), rho(&+[V8.i : i in p21] + V8.Min(p11) + V8.Min(p12)) ] >;
+    elif T[1] eq "CB" then
+        t1 := [ t : t in T[2][2] | Min(&join T[2][2]) in t ][1];
+        return sub< E3 | [rho(&+[V8.i : i in T[2][1]])] cat [rho(&+[V8.i : i in S]) : S in Subsets(t1, 2)] >; 
+    elif T[1] eq "CC" then
+        q1 := [ q : q in T[2] | 1 in q ][1];
+        return sub< E3 | [rho(&+[V8.i : i in S]) : S in Subsets(q1, 2)] >;
+    else
+        assert(false);
+    end if;
+     
 end function;
 
 forward IsCompatible;
