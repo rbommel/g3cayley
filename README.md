@@ -32,6 +32,13 @@ For example, the following script returns `(0eee)`, which means that modulo 3 th
         QuarticTypeFromOctad(f, 3);
 ```
 
+The reduction modulo 7 of same curve  is a quartic with 2 nodes, i.e a curve of geometric genus 1 (type `(1nn)`), and modulo 37 a quartic with a single node, i.e a a curve of geometric genus 2 (type `(2n)`).
+```
+        QuarticTypeFromOctad(f,  7);
+
+        QuarticTypeFromOctad(f, 37);
+```
+
 Of independent interest, the function `QuarticByReductionType(type, p)` (resp. `G3HyperReductionType(type, p)` with `G3QuarticFromHyper(h, p^2)`) returns a quartic of the type given in input, among the 42 possible ones (resp. among the 32 possible hyperelliptic ones).
 
 Examples are given in the directory [`examples`](examples). A full list of intrinsics is [here](intrinsics.md).
