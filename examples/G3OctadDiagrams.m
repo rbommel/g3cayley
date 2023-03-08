@@ -34,7 +34,7 @@ for t := dx to #AllTypes do
     type := AllTypes[t];
 
     "@@@";
-    "@ Testing type", type;
+    "@ Type", type;
     "@@@@@@@@@@@@@@@@@@@@";
     "";
 
