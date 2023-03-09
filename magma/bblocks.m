@@ -315,7 +315,7 @@ function AssociatedSubspace(T)
         return sub< E3 | [ rho(&+[V8.i : i in p11]), rho(&+[V8.i : i in p12]), rho(&+[V8.i : i in p21] + V8.Min(p11) + V8.Min(p12)) ] >;
     elif T[1] eq "CB" then
         t1 := [ t : t in T[2][2] | Min(&join T[2][2]) in t ][1];
-        return sub< E3 | [rho(&+[V8.i : i in T[2][1]])] cat [rho(&+[V8.i : i in S]) : S in Subsets(t1, 2)] >; 
+        return sub< E3 | [rho(&+[V8.i : i in T[2][1]])] cat [rho(&+[V8.i : i in S]) : S in Subsets(t1, 2)] >;
     elif T[1] eq "CC" then
         q1 := [ q : q in T[2] | 1 in q ][1];
         return sub< E3 | [rho(&+[V8.i : i in S]) : S in Subsets(q1, 2)] >;
@@ -346,47 +346,93 @@ function SubspaceCompatible(T1, T2)
 
 end function;
 
-function String(D : Child := false)
+function GreaterThan(a,b)
 
-    if #D eq 0 then
-        return "";
+    if a gt b then
+        return -1;
+    elif a eq b then
+        return 0;
     end if;
-    if Child then
-        return "(" cat &cat Sort([ d[1] cat String(d[2] : Child := true) : d in D]) cat ")";
-    else
-        return &cat Sort([ d[1] cat String(d[2] : Child := true) : d in D]);
+    return 1;
+    
+end function;
+
+function String(D)
+
+    Str := IntegerToString(D[1]);
+    if #D[2] + #D[3] gt 0 then
+        Str cat:= "(";
     end if;
+    if #D[2] gt 0 then
+        Str cat:= "[" cat &cat Sort([ String(d) : d in D[2]], GreaterThan) cat "]";
+    end if;
+    if #D[3] gt 0 then
+        Str cat:= &cat Sort([ String(d) : d in D[3]], GreaterThan);
+    end if;
+    if #D[2] + #D[3] gt 0 then
+        Str cat:= ")";
+    end if;
+    return Str;
 
 end function;
 
-function SubspaceDiagram(T : W := 0)
+function IsotropicVector(V)
 
-    if Type(W) eq Type(0) then
-        W := [AssociatedSubspace(t) : t in T];
-        if "C" in {t[1][1] : t in T} then
-            W2 := W;
-            i := [j : j in [1..#T] | T[j][1][1] eq "C"][1];
-            W2[i] := SymplecticComplement(W[i]);
-            return Max([SubspaceDiagram(T : W := W), SubspaceDiagram(T : W := W2)]);
-        end if;
+    W := V meet SymplecticComplement(V);
+    if Dimension(W) eq 1 then
+        return [w : w in W | w ne 0][1];
+    end if;
+    return V!0;
+
+end function;
+
+function SubspaceGraph(W : DimP := 6, UniqueRep := true)
+
+    if 3 in {Dimension(w) : w in W} and UniqueRep then
+        W2 := W;
+        i := [j : j in [1..#W] | Dimension(W[j]) eq 3][1];
+        W2[i] := SymplecticComplement(W[i]);
+        D := [SubspaceGraph(W : UniqueRep := false), SubspaceGraph(W2 : UniqueRep := false)];
+        _, j := Max([String(d) : d in D]);
+        return D[j];
     end if;
     I := [ i : i in [1..#W] | not(true in {W[i] subset w : w in W | W[i] ne w}) ];
-    D := {* *};
+    Iodd := [ i : i in I | Dimension(W[i]) mod 2 ne 0 ];
+    DL := {* *};
+    DI := {* *};
+    R := {};
+    if #Iodd gt 0 then
+        K := Basis(Kernel(Matrix([IsotropicVector(W[i]) : i in Iodd])));
+        R := { Iodd[i] : i in [1..#Iodd] | true in {k[i] ne 0 : k in K} };
+    end if;
     for i in I do
         Ii := [ j : j in [1..#W] | W[j] ne W[i] and W[j] subset W[i]];
         if #Ii gt 0 then
-            Di := <T[i][1], SubspaceDiagram(T[Ii] : W := W[Ii])>;
+            Di := SubspaceGraph(W[Ii] : DimP := Dimension(W[i]));
             try
-                Include(~D, Di);
+                if i in R then
+                    Include(~DL, Di);
+                else
+                    Include(~DI, Di);
+                end if;
             catch e
-                ChangeUniverse(~D, Parent(Di));
-                Include(~D, Di);
+                if i in R then
+                    ChangeUniverse(~DL, Parent(Di));
+                    Include(~DL, Di);
+                else
+                    ChangeUniverse(~DI, Parent(Di));
+                    Include(~DI, Di);
+                end if;
             end try;
         else
-            Include(~D, <T[i][1], {* *}>); 
+            if i in R then
+                Include(~DL, <Dimension(W[i]), {* *}, {* *}>);
+            else
+                Include(~DI, <Dimension(W[i]), {* *}, {* *}>);
+            end if;
         end if;
     end for;
-    return D;
+    return <DimP, DL, DI>;
 
 end function;
 
