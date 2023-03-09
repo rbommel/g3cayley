@@ -38,10 +38,11 @@ KeySets := [
 V70 := VectorSpace(Rationals(), 70);
 
 // The space E3
+V1 := VectorSpace(GF(2), 1);
 V8 := VectorSpace(GF(2), 8);
 W8 := sub< V8 | [V8.1 + V8.i : i in [2..8]] >;
 E3, rho := quo< W8 | [ W8!&+[V8.i : i in [1..8]] ] >;
-E3_M := hom<E3->E3 | Matrix([ [ &+[GF(2)!Min(Integers()!v1[k], Integers()!v2[k]) : k in [1..8] ] where v1 := (E3.i @@ rho) where v2 := (E3.j @@ rho) : i in [1..6] ] : j in [1..6] ])>;
+E3_M := hom<E3->Hom(E3,V1) | [ hom< E3->V1 | [ &+[GF(2)!Min(Integers()!v1[k], Integers()!v2[k])*V1.1 : k in [1..8] ] where v1 := (E3.i @@ rho) where v2 := (E3.j @@ rho) : i in [1..6] ] > : j in [1..6] ]>;
 
 intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
     { On input of a Cayley octad, this function returns its 70-dimensional plucker vector and its corresponding ordered 4-partitions of \{1..8\} }
@@ -324,7 +325,70 @@ function AssociatedSubspace(T)
      
 end function;
 
+function SymplecticComplement(W)
+
+    WW := E3_M(W);
+    return &meet ([E3] cat [Kernel(w) : w in WW]);
+
+end function;
+
 forward IsCompatible;
+
+function SubspaceCompatible(T1, T2)
+
+    V1 := AssociatedSubspace(T1);
+    V2 := AssociatedSubspace(T2);
+    b12 := V1 subset V2;
+    b21 := V2 subset V1;
+    c12 := V1 subset SymplecticComplement(V2);
+    c21 := V2 subset SymplecticComplement(V1);
+    return (b12 or b21 or c12 or c21) and not(b12 and c12) and not(b21 and c21) and not(b12 and b21);
+
+end function;
+
+function String(D : Child := false)
+
+    if #D eq 0 then
+        return "";
+    end if;
+    if Child then
+        return "(" cat &cat Sort([ d[1] cat String(d[2] : Child := true) : d in D]) cat ")";
+    else
+        return &cat Sort([ d[1] cat String(d[2] : Child := true) : d in D]);
+    end if;
+
+end function;
+
+function SubspaceDiagram(T : W := 0)
+
+    if Type(W) eq Type(0) then
+        W := [AssociatedSubspace(t) : t in T];
+        if "C" in {t[1][1] : t in T} then
+            W2 := W;
+            i := [j : j in [1..#T] | T[j][1][1] eq "C"][1];
+            W2[i] := SymplecticComplement(W[i]);
+            return Max([SubspaceDiagram(T : W := W), SubspaceDiagram(T : W := W2)]);
+        end if;
+    end if;
+    I := [ i : i in [1..#W] | not(true in {W[i] subset w : w in W | W[i] ne w}) ];
+    D := {* *};
+    for i in I do
+        Ii := [ j : j in [1..#W] | W[j] ne W[i] and W[j] subset W[i]];
+        if #Ii gt 0 then
+            Di := <T[i][1], SubspaceDiagram(T[Ii] : W := W[Ii])>;
+            try
+                Include(~D, Di);
+            catch e
+                ChangeUniverse(~D, Parent(Di));
+                Include(~D, Di);
+            end try;
+        else
+            Include(~D, <T[i][1], {* *}>); 
+        end if;
+    end for;
+    return D;
+
+end function;
 
 function IsCompatible(T1, T2)
 
