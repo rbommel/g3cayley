@@ -386,7 +386,7 @@ function IsotropicVector(V)
 
 end function;
 
-function SubspaceGraph(W : DimP := 6, UniqueRep := true)
+function SubspaceGraph(W : P := E3, UniqueRep := true)
 
     if 3 in {Dimension(w) : w in W} and UniqueRep then
         W2 := W;
@@ -402,28 +402,21 @@ function SubspaceGraph(W : DimP := 6, UniqueRep := true)
     DI := {* *};
     R := {};
     if #Iodd gt 0 then
-        K := Basis(Kernel(Matrix([IsotropicVector(W[i]) : i in Iodd])));
+        v := [IsotropicVector(W[i]) : i in Iodd];
+        PPcomp := P meet SymplecticComplement(P);
+        v cat:= Basis(PPcomp);
+        K := Basis(Kernel(Matrix(v)));
         R := { Iodd[i] : i in [1..#Iodd] | true in {k[i] ne 0 : k in K} };
     end if;
     for i in I do
         Ii := [ j : j in [1..#W] | W[j] ne W[i] and W[j] subset W[i]];
         if #Ii gt 0 then
-            Di := SubspaceGraph(W[Ii] : DimP := Dimension(W[i]));
-            try
-                if i in R then
-                    Include(~DL, Di);
-                else
-                    Include(~DI, Di);
-                end if;
-            catch e
-                if i in R then
-                    ChangeUniverse(~DL, Parent(Di));
-                    Include(~DL, Di);
-                else
-                    ChangeUniverse(~DI, Parent(Di));
-                    Include(~DI, Di);
-                end if;
-            end try;
+            Di := SubspaceGraph(W[Ii] : P := W[i]);
+            if i in R then
+                DL join:= {* Di *};
+            else
+                DI join:= {* Di *};
+            end if;
         else
             if i in R then
                 Include(~DL, <Dimension(W[i]), {* *}, {* *}>);
@@ -432,7 +425,7 @@ function SubspaceGraph(W : DimP := 6, UniqueRep := true)
             end if;
         end if;
     end for;
-    return <DimP, DL, DI>;
+    return <Dimension(P), DL, DI>;
 
 end function;
 
@@ -638,5 +631,13 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
 
     MyBenchStop(1, "Cayley Building Blocks", TT);
 
-    return [* Things[k] : k in PotentialSubsets[Sols[1]] *];
+    D := [* Things[k] : k in PotentialSubsets[Sols[1]] *];
+    if "C" in {d[1][1] : d in D} then
+        // Remove degenerate block if necessary
+        V := AssociatedSubspace([d : d in D | d[1][1] eq "C"][1]);
+        VVperp := V meet SymplecticComplement(V);
+        I := [ i : i in [1..#D] | not(D[i][1] in {"Pl", "Tw"}) or (AssociatedSubspace(D[i]) ne VVperp) ];
+        D := D[I];
+    end if;
+    return D;
 end intrinsic;

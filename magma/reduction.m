@@ -12,8 +12,9 @@
  ********************************************************************/
 
 import "verbose.m" : MyBenchIndent, MyBenchStart, MyBenchStop;
-import "stabletypes.m" : AllTypes, OctadDiagrams;
+import "stabletypes.m" : AllTypes, OctadDiagrams, SubspaceGraphs;
 import "loctad.m" : NormaliseOctad;
+import "bblocks.m" : AssociatedSubspace, SubspaceGraph, String;
 
 
 intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
@@ -48,6 +49,8 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     if Type(P) ne Prj then P := ProjectiveSpace(P); end if;
     x := P.1; y := P.2; z := P.3; AssignNames(~P, ["x", "y", "z"]);
     F := Evaluate(F, [x, y, z]);
+    
+    SubspaceType := "";
 
     /* let's go */
     vprintf G3Cayley, 1: "%o***\n", MyBenchIndent("");
@@ -209,7 +212,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
             vprint  G3Cayley, 1: "";
             if onerr then break i; end if;
 
-            /* Decomposition in buiding blocs */
+            /* Decomposition in building blocks */
             tt := MyBenchStart(1, "the Octad diagram of this PGL orbit");
             vprint  G3Cayley, 1: "";
 
@@ -245,6 +248,13 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                 else
                     bbtype join:= {* odiag *};
                 end if;
+                
+                /* Test to see if subspace diagrams give the right answer. */
+                G := SubspaceGraph([AssociatedSubspace(B) : B in ODiag | B[1] ne "Ln"]);
+                NewSubspaceType := AllTypes[Index(SubspaceGraphs, String(G))];
+                assert SubspaceType eq "" or SubspaceType eq NewSubspaceType;
+                SubspaceType := NewSubspaceType;
+                vprintf G3Cayley, 1: "%oThe type based on subspace graphs is: %o\n", MyBenchIndent(""), SubspaceType;
 
                 vprintf G3Cayley, 1: "%o=> Type %o\n%o\n\n", MyBenchIndent(""), odiag, ODiag;
 
@@ -319,6 +329,9 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
 
     /* An anomalous octad diagram ?! */
     if #ThisType ne 1 then return "(?)", BBType; end if;
+
+    /* Check output against subspace type */
+    assert SubspaceType[[2..#SubspaceType-1]] eq ThisType[1][[2..#ThisType[1]-1]];
 
     /* End */
     return ThisType[1], AnalysisLevel gt 0 select BBType else {**};
