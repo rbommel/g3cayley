@@ -49,7 +49,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     if Type(P) ne Prj then P := ProjectiveSpace(P); end if;
     x := P.1; y := P.2; z := P.3; AssignNames(~P, ["x", "y", "z"]);
     F := Evaluate(F, [x, y, z]);
-    
+
     SubspaceType := "";
 
     /* let's go */
@@ -83,6 +83,8 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
         Include(~CreIndexes, S);
     end for;
     CreIndexes := Sort([ Sort(Setseq(E)) : E in CreIndexes ]);
+
+    BBType := {* *};
 
     Prec := PrecMin; onerr := false; TT := Cputime();
     while Prec le PrecMax do
@@ -248,7 +250,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                 else
                     bbtype join:= {* odiag *};
                 end if;
-                
+
                 /* Test to see if subspace diagrams give the right answer. */
                 G := SubspaceGraph([AssociatedSubspace(B) : B in ODiag | B[1] ne "Ln"]);
                 NewSubspaceType := AllTypes[Index(SubspaceGraphs, String(G))];
