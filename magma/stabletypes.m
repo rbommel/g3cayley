@@ -1,3 +1,5 @@
+import "bblocks.m" : CreAction, DiagramAction, MinimalS8Representative;
+
 /* Types */
 AllQuarticTypes := [
     "(3)", "(2n)", "(2e)", "(1nn)", "(1=1)", "(2m)", "(1ne)", "(1ee)", "(0nnn)", "(1---0)", "(1=0n)", "(0nne)", "(1nm)", "(1=0e)", "(1me)", "(0nee)", "(0eee)", "(0----0)", "(0---0n)", "(0n=0n)", "(0nnm)", "(Z=1)", "(0---0e)", "(1=0m)", "(0n=0e)",  "(1mm)",  "(0nme)", "(0e=0e)", "(0mee)", "(CAVE)", "(Z=0n)",  "(0---0m)", "(0n=0m)", "(0nmm)", "(Z=0e)",  "(0m=0e)", "(0mme)", "(BRAID)", "(Z=Z)", "(Z=0m)", "(0m=0m)", "(0mmm)"
@@ -821,3 +823,13 @@ OctadDiagrams := [
     }
 
 ];
+
+// The following procedure generates the full table in Appendix A.
+procedure PrintFullTable()
+
+    for D in ExampleDiagrams[[2..36]] do
+        print "For diagram", D, "we get the following Cremona transformations:";
+        print {* MinimalS8Representative(DiagramAction(D, M)) : M in CreAction *};
+    end for;
+    
+end procedure;

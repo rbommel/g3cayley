@@ -43,6 +43,14 @@ V8 := VectorSpace(GF(2), 8);
 W8 := sub< V8 | [V8.1 + V8.i : i in [2..8]] >;
 E3, rho := quo< W8 | [ W8!&+[V8.i : i in [1..8]] ] >;
 E3_M := hom<E3->Hom(E3,V1) | [ hom< E3->V1 | [ &+[GF(2)!Min(Integers()!v1[k], Integers()!v2[k])*V1.1 : k in [1..8] ] where v1 := (E3.i @@ rho) where v2 := (E3.j @@ rho) : i in [1..6] ] > : j in [1..6] ]>;
+E3_pairs := { rho(V8.i + V8.j) : i,j in [1..8] };
+E3_Matrix := Matrix([E3_M(v) : v in Basis(E3)]);
+_, psi := IsIsometric(SymplecticSpace(E3_Matrix), SymplecticSpace(StandardSymmetricForm(6,2)));
+SymGens := [ hom< E3->E3 | x :-> (psi^(-1))((Hom(E3,E3)!G)(psi(x))) > : G in Generators(SymplecticGroup(6, 2)) ];
+SymGrp := sub< GL(6,2) | [Matrix([nu(E3.i) : i in [1..6]]) : nu in SymGens] >;
+PermGens := [ hom< E3->E3 | x :-> rho( (Hom(V8,V8)!PermutationMatrix(GF(2), P)) (x @@ rho) ) > : P in {[2,1,3,4,5,6,7,8], [2,3,4,5,6,7,8,1]} ];
+PermGrp := sub< GL(6,2) | [Matrix([nu(E3.i) : i in [1..6]]) : nu in PermGens] >;
+CreAction := [Hom(E3,E3)!(M^(-1)) : M in Transversal(SymGrp, PermGrp)];
 
 intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
     { On input of a Cayley octad, this function returns its 70-dimensional plucker vector and its corresponding ordered 4-partitions of \{1..8\} }
@@ -297,6 +305,75 @@ function CayleyBuildingBlocks()
 
 end function;
 
+function AssociatedBlock(V : SetsInsteadOfPairs := false)
+
+    d := Dimension(V);
+    p := #(Set(V) meet E3_pairs);
+    dp := [d, p];
+    
+    case dp:
+        when [1,1]:
+            v := [w @@ rho : w in V | w ne 0][1];
+            if SetsInsteadOfPairs then
+                return <"Pl", { { {i : i in {1..8} | v[i] eq b} : b in GF(2) } } >;
+            end if;
+            return <"Pl", { {i : i in {1..8} | v[i] eq b} : b in GF(2) } >;
+        when [1,2]:
+            v := [w @@ rho : w in V | w ne 0][1];
+            S := { {i : i in {1..8} | v[i] eq b} : b in GF(2) };
+            if SetsInsteadOfPairs then
+                return <"Tw", {{[s : s in S | #s eq 2][1]}}>;
+            end if;
+            return <"Tw", [s : s in S | #s eq 2][1]>;
+        when [2,2]:
+            vs := [w @@ rho : w in V | w ne 0];
+            L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
+            S2 := [s : s in L | #s eq 2][1];
+            S3 := {s diff S2 : s in L | #(s diff S2) eq 3};
+            if SetsInsteadOfPairs then
+                return <"TA", {{S2}, S3}>;
+            end if;
+            return <"TA", <S2, S3> >;
+        when [2,4]:
+            vs := [w @@ rho : w in V | w ne 0];
+            L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
+            S3 := &join [s : s in L | #s eq 2 ];
+            if SetsInsteadOfPairs then
+                return <"TB", {{S3}}>;
+            end if;
+            return <"TB", S3>;
+        when [3,3]:
+            vs := [w @@ rho : w in V | w ne 0];
+            L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
+            P1 := [s : s in L | #s eq 2 ];
+            Q1 := &join P1;
+            P2 := {s diff Q1 : s in L | #(s diff Q1) eq 2 };
+            return <"CA", {Set(P1), P2}>;
+        when [3,5]:
+            vs := [w @@ rho : w in V | w ne 0];
+            L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
+            F := [s : s in L | #s eq 2];
+            P := {i : i in &join F | #{f : f in F | i in f} eq 1};
+            T1 := &join [s : s in F | s ne P];
+            T2 := {1..8} diff P diff T1;
+            if SetsInsteadOfPairs then
+                return <"CB", {{P}, {T1, T2}}>;
+            end if;
+            return <"CB", <P, {T1,T2}>>;
+        when [3,7]:
+            vs := [w @@ rho : w in V | w ne 0];
+            L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
+            P1 := &join [ s : s in L | #s eq 2 ];
+            P2 := {1..8} diff P1;
+            if SetsInsteadOfPairs then
+                return <"CC", {{P1, P2}}>;
+            end if;
+            return <"CC", {P1,P2}>;
+        end case;
+        assert(false);
+
+end function;
+
 function AssociatedSubspace(T)
 
     if T[1] eq "Tw" then
@@ -323,6 +400,33 @@ function AssociatedSubspace(T)
         assert(false);
     end if;
      
+end function;
+
+function DiagramAction(D, M : SetsInsteadOfPairs := false)
+
+    V := [AssociatedSubspace(d) : d in D];
+    if SetsInsteadOfPairs then
+        return { AssociatedBlock(M(v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V };
+    end if;
+    return [* AssociatedBlock(M(v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V *];
+
+end function;
+
+function MinimalS8Representative(D)
+
+    if D eq [* *] then
+        return { };
+    end if;
+    Ds := [x : x in { DiagramAction(D, Hom(E3,E3)!M : SetsInsteadOfPairs) : M in PermGrp } ];
+    for T in [ x : x in ["CC", "CB", "CA", "TB", "TA", "Pl", "Tw"] | x in {d[1] : d in D} ] do
+        Ts := [ Hash({B[2] : B in D | B[1] eq T}) : D in Ds ];
+        M := Min(Ts);
+        I := [i : i in [1..#Ds] | Ts[i] eq M ];
+        Ds := Ds[I];
+    end for;
+    assert #Ds eq 1;
+    return Ds[1];
+
 end function;
 
 function SymplecticComplement(W)
