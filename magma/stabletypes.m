@@ -827,7 +827,7 @@ OctadDiagrams := [
 // The following procedure generates the full table in Appendix A.
 procedure PrintFullTable()
 
-    for D in ExampleDiagrams[[2..36]] do
+    for D in ExampleDiagrams[[2..42]] do
         print "For diagram", D, "we get the following Cremona transformations:";
         print {* MinimalS8Representative(DiagramAction(D, M)) : M in CreAction *};
     end for;
