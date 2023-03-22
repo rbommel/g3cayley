@@ -13,7 +13,7 @@ AllTypes := AllQuarticTypes cat AllHyperTypes;
 
 // p := 101; n := 1;
 // p := 11; n := 2;
-p := 1009; n := 1;
+p := NextPrime(10^6); n := 1;
 
 K := n le 1
     select
@@ -59,3 +59,5 @@ for t := dx to #AllTypes do
     end if;
 
 end for;
+
+quit;
