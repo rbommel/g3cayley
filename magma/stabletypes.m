@@ -824,15 +824,6 @@ OctadDiagrams := [
 
 ];
 
-// The following procedure generates the full table in Appendix A.
-procedure PrintFullTable()
-
-    for D in ExampleDiagrams[[2..42]] do
-        print "For diagram", D, "we get the following Cremona transformations:";
-        print {* MinimalS8Representative(DiagramAction(D, M)) : M in CreAction *};
-    end for;
-
-end procedure;
 
 /* Expected Thetaconstant valuation multiplicities
 
@@ -952,3 +943,13 @@ ThetaValuationMultiplicities := [
     {* 1^^4, 2^^2, 4^^3, 8^^2 *}        /* [0m=0m] */
 
 ];
+
+// The following procedure generates the full table in Appendix A.
+procedure PrintFullTable()
+
+    for D in ExampleDiagrams[[2..42]] do
+        print "For diagram", D, "we get the following Cremona transformations:";
+        print {* MinimalS8Representative(DiagramAction(D, M)) : M in CreAction *};
+    end for;
+
+end procedure;
