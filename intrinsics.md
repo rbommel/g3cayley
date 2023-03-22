@@ -57,3 +57,13 @@ intrinsic CayleyOctadPGLOrbit(O::SeqEnum) -> SeqEnum
 intrinsic CayleyOctadCremonaOrbit(O::SeqEnum) -> SeqEnum
 {Orbit of an octad under Cremona action, restricted to the ordered octad}
 ```
+
+```
+intrinsic G3ThetaCharParity(i::RngIntElt) -> BoolElt
+{The parity of the i-th thetaconstant (in the Aronhold numbering)}
+```
+
+```
+intrinsic G3ThetaFromOctad(i::RngIntElt, Plck::SeqEnum) -> Any
+{On input Plucker coordinates, return the i-th thetaconstant (in the Aronhold numbering)}
+```

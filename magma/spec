@@ -2,6 +2,7 @@
   verbose.m
   loctad.m
   bblocks.m
+  g3thetas.m
   models.m
   reduction.m
 }
