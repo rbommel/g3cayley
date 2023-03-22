@@ -12,7 +12,8 @@ AllTypes := AllQuarticTypes cat AllHyperTypes;
 /* The number field */
 
 // p := 101; n := 1;
-p := 11; n := 2;
+// p := 11; n := 2;
+p := 1009; n := 1;
 
 K := n le 1
     select

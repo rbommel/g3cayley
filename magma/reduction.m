@@ -252,13 +252,30 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                 end if;
 
                 /* Test to see if subspace diagrams give the right answer. */
+                tt0 := MyBenchStart(1, "Subspace diagrams");
                 G := SubspaceGraph([AssociatedSubspace(B) : B in ODiag | B[1] ne "Ln"]);
                 NewSubspaceType := AllTypes[Index(SubspaceGraphs, String(G))];
                 assert SubspaceType eq "" or SubspaceType eq NewSubspaceType;
                 SubspaceType := NewSubspaceType;
                 vprintf G3Cayley, 1: "%oThe type based on subspace graphs is: %o\n", MyBenchIndent(""), SubspaceType;
 
-                vprintf G3Cayley, 1: "%o=> Type %o\n%o\n\n", MyBenchIndent(""), odiag, ODiag;
+                vprintf G3Cayley, 1: "%o=> Type %o\n%o\n", MyBenchIndent(""), odiag, ODiag;
+                MyBenchStop(1, "subspace diagrams", tt0);
+
+                /* Even thetaconstant valuations */
+                tt0 := MyBenchStart(1, "Thetaconstants");
+                ThetaConstants := [ G3ThetaFromOctad(i, PGLPlOrb[k]) : i in [1..64] | G3ThetaCharParity(i) ];
+                ThetaVal := [ Valuation(t) : t in ThetaConstants ];
+                vl := -Infinity(); ThetaValuations := {**}; Nvl := 0;
+                while Nvl lt #ThetaVal do
+                    vl  := Min([ v : v in ThetaVal | v gt vl] );
+                    nvl := #[ v : v in ThetaVal | v eq vl];
+                    ThetaValuations join:= {* vl^^nvl *};
+                    Nvl +:= nvl;
+                end while;
+                vprintf G3Cayley, 1: "%o=> Valuations are %o\n", MyBenchIndent(""), ThetaValuations;
+                MyBenchStop(1, "thetaconstants", tt0);
+
 
             end for;
 
