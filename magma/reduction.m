@@ -23,7 +23,8 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     gbasis := false,
     LPrate := 10,
     randomize := true,
-    AnalysisLevel := 0) -> MonStgElt, SetMulti
+    AnalysisLevel := 0,
+    subspace := true) -> MonStgElt, SetMulti
 
     {Stable reduction type of a quartic via a Cayley octad approach}
 
@@ -251,16 +252,18 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                     bbtype join:= {* odiag *};
                 end if;
 
-                /* Test to see if subspace diagrams give the right answer. */
-                tt0 := MyBenchStart(1, "Subspace diagrams");
-                G := SubspaceGraph([AssociatedSubspace(B) : B in ODiag | B[1] ne "Ln"]);
-                NewSubspaceType := AllTypes[Index(SubspaceGraphs, String(G))];
-                assert SubspaceType eq "" or SubspaceType eq NewSubspaceType;
-                SubspaceType := NewSubspaceType;
-                vprintf G3Cayley, 1: "%oThe type based on subspace graphs is: %o\n", MyBenchIndent(""), SubspaceType;
+                if subspace then
+                    /* Test to see if subspace diagrams give the right answer. */
+                    tt0 := MyBenchStart(1, "Subspace diagrams");
+                    G := SubspaceGraph([AssociatedSubspace(B) : B in ODiag | B[1] ne "Ln"]);
+                    NewSubspaceType := AllTypes[Index(SubspaceGraphs, String(G))];
+                    assert SubspaceType eq "" or SubspaceType eq NewSubspaceType;
+                    SubspaceType := NewSubspaceType;
+                    vprintf G3Cayley, 1: "%oThe type based on subspace graphs is: %o\n", MyBenchIndent(""), SubspaceType;
 
-                vprintf G3Cayley, 1: "%o=> Type %o\n%o\n", MyBenchIndent(""), odiag, ODiag;
-                MyBenchStop(1, "subspace diagrams", tt0);
+                    vprintf G3Cayley, 1: "%o=> Type %o\n%o\n", MyBenchIndent(""), odiag, ODiag;
+                    MyBenchStop(1, "subspace diagrams", tt0);
+                end if;
 
                 /* Even thetaconstant valuations */
                 tt0 := MyBenchStart(1, "Thetaconstants");
@@ -302,6 +305,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                             ok := false; break;
                         end if;
                     end for;
+                    if ok then break; end if;
                 end for;
                 if ok then Include(~curType, AllTypes[j]); end if;
                 j +:= 1;
@@ -349,8 +353,9 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     /* An anomalous octad diagram ?! */
     if #ThisType ne 1 then return "(?)", BBType; end if;
 
+
     /* Check output against subspace type */
-    assert SubspaceType[[2..#SubspaceType-1]] eq ThisType[1][[2..#ThisType[1]-1]];
+    assert not subspace or (SubspaceType[[2..#SubspaceType-1]] eq ThisType[1][[2..#ThisType[1]-1]]);
 
     /* End */
     return ThisType[1], AnalysisLevel gt 0 select BBType else {**};
