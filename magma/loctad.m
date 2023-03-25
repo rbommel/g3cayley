@@ -688,7 +688,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
                 apol := u6;
             elif Degree(apol) gt 1 then
                 u6 := UnivariatePolynomial(Evaluate(q3, [aq, b1, c1, One(SU)]));
-                apol := pAdicGCD(apol, u6 : LPrate := LPrate);
+                apol := pAdicGCD(1, apol, u6 : LPrate := LPrate);
             end if;
             assert(Degree(apol) ge 1);
 
