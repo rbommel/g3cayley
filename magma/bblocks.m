@@ -307,6 +307,21 @@ end function;
 
 function AssociatedBlock(V : SetsInsteadOfPairs := false)
 
+    if Type(V) eq SetEnum then
+        p := {i : i in {2..8} | rho(V8.1 + V8.i) in V};
+        if #p eq 7 then
+            return <"TCu", {}>;
+        else
+            assert(#p eq 3);
+            q1 := Include(p, 1);
+            q2 := {1..8} diff q1;
+            if SetsInsteadOfPairs then
+                return <"Ln", {{q1, q2}}>;
+            end if;
+            return <"Ln", {q1, q2}>;
+        end if;
+    end if;
+
     d := Dimension(V);
     p := #(Set(V) meet E3_pairs);
     dp := [d, p];
@@ -396,19 +411,34 @@ function AssociatedSubspace(T)
     elif T[1] eq "CC" then
         q1 := [ q : q in T[2] | 1 in q ][1];
         return sub< E3 | [rho(&+[V8.i : i in S]) : S in Subsets(q1, 2)] >;
+    elif T[1] eq "Ln" then
+        q1 := [ q : q in T[2] | not(1 in q) ][1];
+        S := &join[ { s : s in Subsets({2..8}, card) | #(s meet q1) mod 2 eq 0 } : card in [2,6] ] join { s : s in Subsets({2..8}, 4) | #(s meet q1) mod 2 eq 1 };    
+        return {E3|0} join { rho(&+[V8.i : i in s]) : s in S };
+    elif T[1] eq "TCu" then
+        return E3_pairs;    
     else
         assert(false);
     end if;
      
 end function;
 
+function Act(M, V)
+
+    if Type(V) eq SetEnum then
+        return {M(v) : v in V};
+    end if;
+    return M(V);
+
+end function;
+
 function DiagramAction(D, M : SetsInsteadOfPairs := false)
 
-    V := [AssociatedSubspace(d) : d in D];
+    V := [* AssociatedSubspace(d) : d in D *];
     if SetsInsteadOfPairs then
-        return { AssociatedBlock(M(v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V };
+        return { AssociatedBlock(Act(M,v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V };
     end if;
-    return [* AssociatedBlock(M(v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V *];
+    return [* AssociatedBlock(Act(M,v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V *];
 
 end function;
 
@@ -418,7 +448,7 @@ function MinimalS8Representative(D)
         return { };
     end if;
     Ds := [x : x in { DiagramAction(D, Hom(E3,E3)!M : SetsInsteadOfPairs) : M in PermGrp } ];
-    for T in [ x : x in ["CC", "CB", "CA", "TB", "TA", "Pl", "Tw"] | x in {d[1] : d in D} ] do
+    for T in [ x : x in ["Ln","CC", "CB", "CA", "TB", "TA", "Pl", "Tw"] | x in {d[1] : d in D} ] do
         Ts := [ Hash({B[2] : B in D | B[1] eq T}) : D in Ds ];
         M := Min(Ts);
         I := [i : i in [1..#Ds] | Ts[i] eq M ];
@@ -442,6 +472,19 @@ function SubspaceCompatible(T1, T2)
 
     V1 := AssociatedSubspace(T1);
     V2 := AssociatedSubspace(T2);
+    if Type(V1) eq SetEnum then
+        if Type(V2) eq SetEnum then
+            return false;
+        end if;
+        if Dimension(V2) gt 1 then
+            V2 := Set(V2) diff Set(SymplecticComplement(V2));
+        else
+            V2 := Set(V2);
+        end if;
+        return V2 subset V1;
+    elif Type(V2) eq SetEnum then
+        return SubspaceCompatible(T2, T1);
+    end if;
     b12 := V1 subset V2;
     b21 := V2 subset V1;
     c12 := V1 subset SymplecticComplement(V2);
@@ -491,6 +534,12 @@ function IsotropicVector(V)
 end function;
 
 function SubspaceGraph(W : P := E3, UniqueRep := true)
+
+    if SetEnum in {Type(w) : w in W} then
+        D := SubspaceGraph([w : w in W | Type(w) ne SetEnum] : UniqueRep := UniqueRep);
+        D[1] := 7;
+        return D;
+    end if;
 
     if 3 in {Dimension(w) : w in W} and UniqueRep then
         W2 := W;
@@ -548,6 +597,8 @@ function IsCompatible(T1, T2)
             return { { #(T1[2] meet p) : p in q } : q in T2[2] } eq { {0}, {0,2} };
         elif T2[1] eq "CB" then
             return { #(T1[2] meet t) : t in T2[2][2] } in { {0}, { 0, 2 } };
+        elif T2[1] eq "TCu" then
+            return true;
         end if;
 
     elif T1[1] eq "Pl" then
@@ -565,6 +616,8 @@ function IsCompatible(T1, T2)
             return T1[2] eq T2[2];
         elif T2[1] eq "Ln" then
             return { #(p1 meet p2) : p1 in T1[2], p2 in T2[2] } eq { 1, 3 };
+        elif T2[1] eq "TCu" then
+            return false;
         else
             return IsCompatible(T2, T1);
         end if;
@@ -578,7 +631,7 @@ function IsCompatible(T1, T2)
             return { { { #(t meet p) : t in T1[2][2] } : p in q } : q in T2[2] } eq { { {0, 2} }  , { { 0 }, { 1 } } };
         elif T2[1] eq "CB" then
             return {* #(t1 meet t2) : t1 in T1[2][2], t2 in T2[2][2] *} eq {* 0, 0, 1, 3 *};
-        elif T2[1] eq "CC" then
+        elif T2[1] in {"CC", "TCu"} then
             return false;
         elif T2[1] eq "Ln" then
             return { { #(p meet t) : t in T1[2][2]} : p in T2[2] } eq  { {0,2}, {1,3} };
@@ -597,12 +650,14 @@ function IsCompatible(T1, T2)
             return true in { T1[2] subset p : p in T2[2] };
         elif T2[1] eq "Ln" then
             return { #(p meet T1[2]) : p in T2[2] } eq { 0, 3 };
+        elif T2[1] eq "TCu" then
+            return true;
         else
             return IsCompatible(T2, T1);
         end if;
 
     elif T1[1] eq "CA" then
-        if T2[1] in {"CA", "CB", "CC"} then
+        if T2[1] in {"CA", "CB", "CC", "TCu"} then
             return false;
         elif T2[1] eq "Ln" then
             return { { { #(p meet t) : p in q} : q in T1[2]} : t in T2[2] } eq  { { { 0, 2 } } };
@@ -611,7 +666,7 @@ function IsCompatible(T1, T2)
         end if;
 
     elif T1[1] eq "CB" then
-        if T2[1] in {"CB", "CC"} then
+        if T2[1] in {"CB", "CC", "TCu"} then
             return false;
         elif T2[1] eq "Ln" then
             return { { #(p meet t) : t in T1[2][2]} : p in T2[2] } eq { {0, 3} };
@@ -624,12 +679,21 @@ function IsCompatible(T1, T2)
             return false;
         elif T2[1] eq "Ln" then
             return T1[2] eq T2[2];
+        elif T2[1] eq "TCu" then
+            return true;
         else
             return IsCompatible(T2, T1);
         end if;
 
     elif T1[1] eq "Ln" then
-        if T2[1] eq "Ln" then
+        if T2[1] in {"Ln", "TCu"} then
+            return false;
+        else
+            return IsCompatible(T2, T1);
+        end if;
+        
+    elif T1[1] eq "TCu" then
+        if T2[1] eq "TCu" then
             return false;
         else
             return IsCompatible(T2, T1);
