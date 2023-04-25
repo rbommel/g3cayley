@@ -755,7 +755,7 @@ intrinsic CayleyOctadPGLOrbit(O::SeqEnum) -> SeqEnum
 end intrinsic;
 
 intrinsic CayleyOctadCremonaOrbit(Octad::SeqEnum) -> SeqEnum
-    {Orbit of an octad under Cremona action, restricted to the ordered octad}
+    {Orbit of an octad under Cremona action, restricted to octads in standard position}
 
     Indexes := {};
     for S in Subsets({1..8}, 4) do

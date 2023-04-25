@@ -1,5 +1,6 @@
 {
   verbose.m
+  g3octad.m
   loctad.m
   bblocks.m
   g3thetas.m
