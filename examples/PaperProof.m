@@ -3,9 +3,30 @@
   [Bom+23] R. van Bommel, J. Docking, V. Dokchitser, R. Lercier and E. Lorenzo García, Reduction of plane quartics and Cayley octads, arXiv:xxx.
 */
 
+/* Checking flags, set the one you want to true.
+   By default, they are all set to true.
+ */
+DefaultCases := true;
+
+RegularCase     := false;
+Alpha1av1Case   := false;
+Alpha1av2Case   := false;
+Alpha2bv1Case   := false;
+Alpha2bv2Case   := false;
+
+if DefaultCases then
+    RegularCase     := true;
+    Alpha1av1Case   := true;
+    Alpha1av2Case   := true;
+    Alpha2bv1Case   := true;
+    Alpha2bv2Case   := true;
+end if;
+
 "";
 
 /* Toolbox */
+_, KeySets := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
+
 function AdHocVal(pol, P)
 
     if pol eq 0 then return Infinity(), 0; end if;
@@ -31,247 +52,316 @@ function AdHocNormalize(Octad, P)
     return Oct;
 end function;
 
+
+function CremonaImage(_O, ijklm)
+
+    OL := [_O[i] : i in ijklm];
+    M5 := Matrix(OL);
+    K5 := KernelMatrix(M5); assert(Nrows(K5) eq 1);
+    N := Matrix(4, 4, [ OL[i,j] * K5[1,i] : i,j in [1..4] ]);
+    O2 := Matrix(_O) * N^(-1);
+
+    ijk := Setseq({1..8} diff Seqset(ijklm));
+
+    for i in ijk do
+        for l := 1 to 4 do O2[i,l] := 1/O2[i,l]; end for;
+    end for;
+
+    return [ Eltseq(O2[i]) : i in [1..8] ];
+
+end function;
+
+procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
+
+    Foctad := Universe(_O[1]); P := Foctad.Rank(Foctad);
+    Poctad := RingOfIntegers(Foctad); p := Numerator(P);
+
+    /* The first octad */
+    O := AdHocNormalize(_O, P);
+
+    /* It's valuation data */
+    PlckO, KeySets := PluckerCoordinates(O);
+
+    VPlO := Vector([ AdHocVal(e, P) eq Infinity() select 1 else AdHocVal(e, P): e in PlckO ]);
+    "\t_ Valuation data of O  equal to a " cat tpO cat "-block:", VPlO eq vO;
+
+    /* It's Cremona image */
+    Oc := AdHocNormalize(_Oc, P);
+
+    /* It's valuation data */
+    PlckOc, KeySets := PluckerCoordinates(Oc);
+
+    VPlOc := Vector([ AdHocVal(e, P) eq Infinity() select 1 else AdHocVal(e, P): e in PlckOc ]);
+    "\t_ Valuation data of O' equal to a " cat tpOc cat "-block:", VPlOc eq vOc;
+
+    /* Relations that make O degenerate */
+    OEquations := [];
+    for i := 1 to #KeySets do
+        v, e := AdHocVal(PlckO[i], P);
+        Append(~OEquations, v eq Infinity() select Foctad!1 else Foctad!e);
+    end for;
+
+    ODegenerate :=
+        &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Numerator(OEquations[i])]>)} : i in [1..70] | PlckO[i] ne 0 }
+        join
+        &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Denominator(OEquations[i])]>)} : i in [1..70] | PlckO[i] ne 0 };
+
+    /* Relations that make Oc degenerate */
+    OcEquations := [];
+    for i := 1 to #KeySets do
+        v, e := AdHocVal(PlckOc[i], P);
+        Append(~OcEquations, v eq Infinity() select Foctad!1 else Foctad!e);
+    end for;
+
+    OcDegenerate :=
+        &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Numerator(OcEquations[i])]>)} : i in [1..70] | PlckOc[i] ne 0 }
+        join
+        &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Denominator(OcEquations[i])]>)} : i in [1..70] | PlckOc[i] ne 0 };
+
+    /* When PclkOc degenerate while Plck does not ? */
+    BadCases := Sort(Setseq(OcDegenerate diff ODegenerate));
+
+    "\t_ Number of bad cases to examine:", #BadCases;
+
+    if #BadCases gt 0 then
+
+        /* Does it correspond to hyperelliptic  degeneracy, as expected ? */
+
+        /* The hyperelliptic locus, mod p */
+        TwCubO  := Setseq({ Coefficient(Numerator(e),p,0) : e in CayleyOctadTwistedCubicRelations(PlckO) });
+
+        "\t_Do they correspond to hyperelliptic reduction?!",
+            [ { NormalForm(Coefficient(Numerator(e), p, 0), sys) : e in TwCubO } eq {0} : sys in BadCases ];
+    else
+        "\t=> Everything's fine!";
+    end if;
+    "";
+
+end procedure;
+
+/* Let's go! */
+Fld := Rationals();
+
+/*
+ * Generic check - Cremona action on a regular octad
+ ***************************************************/
+
+if RegularCase then
+
+    /*** ABCD|EFGH ***/
+    "Cremona action ABCD|EFGH on a regular octad";
+
+    /* Ring definitions  */
+    Poctad<
+        a0, a1, a2, a3,
+        b0, b1, b2, b3,
+        p > := PolynomialRing(Fld, [ 1 : i in [1..2*4+1] ]);
+    Foctad<
+        A0, A1, A2, A3,
+        B0, B1, B2, B3,
+        P > := FieldOfFractions(Poctad);
+
+    /* The octad */
+    tpO := "regular";
+    vO  := Vector([ 0 : K in KeySets ]);
+    O6 := [ a0, a1, a2, a3 ]; O7 := [ b0, b1, b2, b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "regular";
+    vOc  := Vector([ 0 : K in KeySets ]);
+    _Oc := CremonaImage(_O, [1, 2, 3, 4, 5]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+    "----------------------";
+    "";
+
+end if;
+
 /*
  * Theorem 4.4 - Cremona action on alpha blocks
  ************************************************/
 
-/*** Alpha_{1a} case ***/
+/*** Alpha_{1} case ***/
+/**********************/
+
+if Alpha1av1Case then
+
+    /*** ABCD|EFGH ***/
+    "Cremona action ABCD|EFGH on Alpha_{1a}";
+
+    /* Ring definitions  */
+    Poctad<
+        a1, a2, a3,
+        b1, b2, b3,
+        p > := PolynomialRing(Fld, [ 1 : i in [1..2*3+1] ]);
+    Foctad<
+        A1, A2, A3,
+        B1, B2, B3,
+        P > := FieldOfFractions(Poctad);
+
+    /* The octad */
+    tpO := "Alpha^AB_1a";
+    vO  := Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    O6 := [ 1, a1, a2, a3 ]; O7 := [ 1, a1+p*b1, a2+p*b2, a3+p*b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        O6,
+        O7,
+        O8,
+        [ 1, 1, 1, 1 ],
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ]
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Alpha^AB_1a";
+    vOc  := Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    _Oc := CremonaImage(_O, [5,6,7,8, 4]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Alpha1av2Case then
+
+    /*** ACDE | BFGH ***/
+
+    /* Ring definitions  */
+    Poctad<
+        g1, g2, g3,
+        b1, b2, b3,
+        p > := PolynomialRing(Fld, [ 1 : i in [1..2*3+1] ]);
+    Foctad<
+        G1, G2, G3,
+        B1, B2, B3,
+        P > := FieldOfFractions(Poctad);
+
+    "Cremona action ACDE|BFGH on Alpha_{1a}";
+
+    /* The octad */
+    tpO := "Alpha^AB_1a";
+    vO  := Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    O6 := [ 1, p*b1, p*b2, p*b3 ]; O7 := [ 1, g1, g2, g3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0,  0,  0 ],
+        O6,
+        [ 0, 1,  0,  0 ],
+        [ 0, 0,  1,  0 ],
+        [ 0, 0,  0,  1 ],
+        [ 1, 1,  1,  1 ],
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Alpha^BCDE_2a";
+    vOc  := Vector([ Max(0, #(K meet {2,3,4,5}) - 3) + Max(0, #(K meet {1,6,7,8}) - 3) : K in KeySets ]);
+    _Oc := CremonaImage(_O, [1,3,4,5, 6]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+    "----------------------";
+    "";
+
+end if;
+
+/*** Alpha_{2} case ***/
 /***********************/
 
-/* ABCD|EFGH
- ***/
-"Cremona action ABCD|EFGH on Alpha_{1a}";
+if Alpha2bv1Case then
 
-/* Ring definitions  */
-Fld := Rationals();
+    /*** ABCD|EFGH ***/
+    "Cremona action ABCD|EFGH on Alpha_{2b}";
 
-Poctad<
-    a0, a1, a2, a3,
-    b0, b1, b2, b3,
-    c0, c1, c2, c3,
-    p > := PolynomialRing(Fld, [ 1 : i in [1..3*4+1] ]);
+    /* Ring definitions  */
+    Poctad<
+        a1, a2, a3,
+        b1, b2, b3,
+        p > := PolynomialRing(Fld, [ 1 : i in [1..2*3+1] ]);
+    Foctad<
+        A1, A2, A3,
+        B1, B2, B3,
+        P > := FieldOfFractions(Poctad);
 
-Foctad<
-    A0, A1, A2, A3,
-    B0, B1, B2, B3,
-    C0, C1, C2, C3,
-    P > := FieldOfFractions(Poctad);
+    /* The octad */
+    tpO := "Alpha^ABCD_2b";
+    vO  := Vector([ Max(0, #(K meet {1,2,3,4}) - 1) + Max(0, #(K meet {1,2,3,4}) - 3) : K in KeySets ]);
+    O6 := [ 1, a1*p+1, a2*p+1, a3*p+1 ]; O7 := [ 1, b1*p+1, b2*p+1, b3*p+1 ]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        O6,
+        O7,
+        O8,
+        [ 1, 1, 1, 1 ],
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ]
+        ];
 
-/* The octad */
-O := [
-    [ a0,      a1,      a2,      a3 ],
-    [ a0+p*b0, a1+p*b1, a2+p*b2, a3+p*b3 ],
-    [ c0,      c1,      c2,      c3 ],
-    [ 1, 1, 1, 1 ],
-    [ 1, 0, 0, 0 ],
-    [ 0, 1, 0, 0 ],
-    [ 0, 0, 1, 0 ],
-    [ 0, 0, 0, 1 ]
-    ];
-O := AdHocNormalize(O, P);
+    /* It's Cremona image */
+    tpOc := "Alpha^ABCD_2b";
+    vOc  := Vector([ Max(0, #(K meet {1,2,3,4}) - 1) + Max(0, #(K meet {1,2,3,4}) - 3) : K in KeySets ]);
+    _Oc := CremonaImage(_O, [5,6,7,8, 4]);
 
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
 
-/* It's valuation data */
-PlckO, KeySets := PluckerCoordinates(O);
-VPlO := Vector([ AdHocVal(e, P) : e in PlckO ]);
-"\t_ Valuation data of O  equal to Alpha^AB_1a:",
-    VPlO eq Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+end if;
 
-/* Relations among the coefficients, mod p */
-OctadRels := Setseq({ Coefficient(Numerator(e),p,0) : e in CayleyOctadRelations(PlckO) });
-OctadRels := GroebnerBasis(OctadRels);
+if Alpha2bv2Case then
 
-/* It's Cremona image */
-Oc := [
-    [ 1/e : e in O[1] ],
-    [ 1/e : e in O[2] ],
-    [ 1/e : e in O[3] ],
-    [ 1, 1, 1, 1 ],
-    [ 1, 0, 0, 0 ],
-    [ 0, 1, 0, 0 ],
-    [ 0, 0, 1, 0 ],
-    [ 0, 0, 0, 1 ]
-    ];
-Oc := AdHocNormalize(Oc, P);
+    /* ABEF|CDGH ***/
+    "Cremona action ABEF|CDGH on Alpha_{2b}";
 
-/* It's valuation data */
-PlckOc, KeySets := PluckerCoordinates(Oc);
-PlckOc := [
-    NormalForm(Numerator(e), OctadRels) / NormalForm(Denominator(e), OctadRels)
-    : e in PlckOc
-    ];
-VPlOc := Vector([ AdHocVal(e, P) : e in PlckOc ]);
-"\t_ Valuation data of O' equal to Alpha^AB_1a:",
-    VPlOc eq Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    /* Ring definitions  */
+    Poctad<
+        a1, a2, a3,
+        b1, b2, b3,
+        p > := PolynomialRing(Fld, [ 1 : i in [1..2*3+1] ]);
+    Foctad<
+        A1, A2, A3,
+        B1, B2, B3,
+        P > := FieldOfFractions(Poctad);
 
-/* Relations that make O degenerate */
-ODegenerate :=
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Coefficient(Numerator(PlckO[i]),p,0)]>)} : i in [1..70] | PlckO[i] ne 0 }
-    join
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Coefficient(Denominator(PlckO[i]),p,0)]>)} : i in [1..70] | PlckO[i] ne 0 };
+    /* The octad */
+    tpO := "Alpha^ABCD_2b";
+    vO  := Vector([ Max(0, #(K meet {1,2,3,4}) - 3) + Max(0, #(K meet {5,6,7,8}) - 3) : K in KeySets ]);
+    O6 :=  [ 0+p, a1, a2, a3 ]; O7 := [ 1, b1, b2, b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        O6,
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        [ 1, 0, 0, 0 ],
+        O7,
+        O8
+        ];
 
-/* Make the Cayley octad relation enter in the game */
-ODegenerate := &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|sys cat OctadRels>)} : sys in ODegenerate };
+    /* It's Cremona image */
+    tpOc := "Alpha^AF_2a";
+    vOc  := Vector([ Max(0, #(K meet {1,6}) - 1) : K in KeySets ]);
+    _Oc := CremonaImage(_O, [6,2,3,4, 5]);
 
-/* Relations that make Oc degenerate */
-OcDegenerate :=
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Coefficient(Numerator(PlckOc[i]),p,0)]>)} : i in [1..70] | PlckOc[i] ne 0 }
-    join
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Coefficient(Denominator(PlckOc[i]),p,0)]>)} : i in [1..70] | PlckO[i] ne 0 };
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
 
-/* Make the Cayley octad relation enter in the game too */
-OcDegenerate := &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|sys cat OctadRels>)} : sys in OcDegenerate };
+    "----------------------";
+    "";
 
-/* When PclkOc degenerate while Plck does not ? */
-BadCases := OcDegenerate diff ODegenerate;
-"\t_ Degeneracy case(s):", BadCases;
-
-/* Does it correspond to hyperelliptic  degeneracy, as expected ? */
-TwCubO  := {* e : e in CayleyOctadTwistedCubicRelations(PlckO) *};
-
-"\t_ Do they correspond to hyperelliptic reduction:",
-    [ { NormalForm(Coefficient(Numerator(e), p, 0), sys) : e in TwCubO } eq {0} : sys in BadCases ];
-
-"";
-
-/*
-    [
-        a0*a2*c0*c1 - a1*a2*c0*c1 - a0*a1*c0*c2 + a1*a2*c0*c2 + a0*a1*c1*c2 - a0*a2*c1*c2,
-        a0*a3*c0*c1 - a1*a3*c0*c1 - a0*a1*c0*c3 + a1*a3*c0*c3 + a0*a1*c1*c3 - a0*a3*c1*c3,
-        a0*a3*c0*c2 - a2*a3*c0*c2 - a0*a2*c0*c3 + a2*a3*c0*c3 + a0*a2*c2*c3 - a0*a3*c2*c3,
-        a1*a3*c1*c2 - a2*a3*c1*c2 - a1*a2*c1*c3 + a2*a3*c1*c3 + a1*a2*c2*c3 - a1*a3*c2*c3
-    ]
-*/
-
-
-/* ACDE|BFGH
- ***/
-
-/* Ring definitions  */
-Fld := Rationals();
-
-Poctad<
-    b0, b1, b2, b3,
-    g0, g1, g2, g3,
-    h0, h1, h2, h3,
-    p > := PolynomialRing(Fld, [ 1 : i in [1..3*4+1] ]);
-
-Foctad<
-    B0, B1, B2, B3,
-    G0, G1, G2, G3,
-    H0, H1, H2, H3,
-    P > := FieldOfFractions(Poctad);
-
- "Cremona action ACDE|BFGH on Alpha_{1a}";
-
-/* The octad */
-O := [
-    [ 1, 0, 0, 0 ],
-    [ 1+p*b0, 0+p*b1, 0+p*b2, 0+p*b3 ],
-    [ 0, 1, 0, 0 ],
-    [ 0, 0, 1, 0 ],
-    [ 0, 0, 0, 1 ],
-    [ 1, 1, 1, 1 ],
-    [ g0,     g1,      g2,    g3 ],
-    [ h0,     h1,      h2,    h3 ]
-    ];
-O := AdHocNormalize(O, P);
-
-/* It's valuation data */
-PlckO, KeySets := PluckerCoordinates(O);
-VPlO := Vector([ AdHocVal(e, P) : e in PlckO ]);
-"\t_ Valuation data of O  equal to Alpha^AB_1a:",
-    VPlO eq Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
-
-/* Relations among the coefficients, mod p */
-ORels := Setseq({ Coefficient(Numerator(e),p,0) : e in CayleyOctadRelations(PlckO) });
-ORels := GroebnerBasis(ORels);
-
-/* It's Cremona image */
-Oc := [
-    [ 1, 0, 0, 0 ],
-    [ 1/e : e in O[2] ],
-    [ 0, 1, 0, 0 ],
-    [ 0, 0, 1, 0 ],
-    [ 0, 0, 0, 1 ],
-    [ 1, 1, 1, 1 ],
-    [ 1/e : e in O[7] ],
-    [ 1/e : e in O[8] ]
-    ];
-Oc := AdHocNormalize(Oc, P);
-
-/* It's valuation data */
-PlckOc, KeySets := PluckerCoordinates(Oc);
-PlckOc := [
-    NormalForm(Numerator(e), ORels) / NormalForm(Denominator(e), ORels)
-    : e in PlckOc
-    ];
-VPlOc := Vector([ AdHocVal(e, P) eq Infinity() select 1 else  AdHocVal(e, P) : e in PlckOc ]);
-"\t_ Valuation data of O' equal to Alpha^BCDE_2a:",
-    VPlOc eq Vector([ Max(0, #(K meet {2,3,4,5}) - 3) + Max(0, #(K meet {1,6,7,8}) - 3) : K in KeySets ]);
-
-/* Relations among the coefficients, mod p */
-OcRels := Setseq({ Coefficient(Numerator(e),p,0) : e in CayleyOctadRelations(PlckOc) });
-OcRels := GroebnerBasis(OcRels);
-
-/* Relations that make O degenerate */
-OEquations := [];
-for i := 1 to #KeySets do
-    v, e := AdHocVal(PlckO[i], P);
-    Append(~OEquations, v eq Infinity() select 1 else e);
-end for;
-
-ODegenerate :=
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Numerator(OEquations[i])]>)} : i in [1..70] | PlckO[i] ne 0 }
-    join
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Denominator(OEquations[i])]>)} : i in [1..70] | PlckO[i] ne 0 };
-
-/* Make the Cayley octad relation enter in the game */
-ODegenerate := &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|sys cat ORels cat OcRels>)} : sys in ODegenerate };
-
-/* Relations that make Oc degenerate */
-OcEquations := [];
-for i := 1 to #KeySets do
-    v, e := AdHocVal(PlckOc[i], P);
-    i, v, e;
-    Append(~OcEquations, v eq Infinity() select Foctad!1 else e);
-end for;
-
-OcDegenerate :=
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Numerator(OcEquations[i])]>)} : i in [1..70] | PlckOc[i] ne 0 }
-    join
-    &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Denominator(OcEquations[i])]>)} : i in [1..70] | PlckOc[i] ne 0 };
-
-/* Make the Cayley octad relation enter in the game too */
-OcDegenerate := &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|sys cat ORels cat OcRels>)} : sys in OcDegenerate };
-
-/* When PclkOc degenerate while Plck does not ? */
-BadCases := Setseq(OcDegenerate diff ODegenerate);
-"\t_ Degeneracy case(s):", BadCases;
-
-/* Does it correspond to hyperelliptic  degeneracy, as expected ? */
-TwCubO  := {* e : e in CayleyOctadTwistedCubicRelations(PlckO) *};
-
-"\t_ Do they correspond to hyperelliptic reduction:",
-    [ { NormalForm(Coefficient(Numerator(e), p, 0), sys) : e in TwCubO } eq {0} : sys in BadCases ];
-
-/*
-    [
-        b1*g1*g3*h0*h2 - b1*g2*g3*h0*h2 - b1*g1*g2*h0*h3 + b2*g1*g2*h0*h3 - b2*g1*g3*h0*h3 + b1*g2*g3*h0*h3 + b1*g1*g2*h2*h3 - b2*g1*g2*h2*h3 - b1*g1*g3*h2*h3 + b2*g1*g3*h2*h3,
-        b1*g0*g3*h1*h2 - b2*g0*g3*h1*h2 - b1*g2*g3*h1*h2 + b2*g2*g3*h1*h2 - b1*g0*g2*h1*h3 + b2*g0*g3*h1*h3 + b1*g2*g3*h1*h3 - b2*g2*g3*h1*h3 + b1*g0*g2*h2*h3 - b1*g0*g3*h2*h3,
-        b1*b3*g1*g2 - b2*b3*g1*g2 - b1*b2*g1*g3 + b2*b3*g1*g3 + b1*b2*g2*g3 - b1*b3*g2*g3,
-
-        g0*g2*h0*h1 - g1*g2*h0*h1 - g0*g1*h0*h2 + g1*g2*h0*h2 + g0*g1*h1*h2 - g0*g2*h1*h2,
-        g0*g3*h0*h1 - g1*g3*h0*h1 - g0*g1*h0*h3 + g1*g3*h0*h3 + g0*g1*h1*h3 - g0*g3*h1*h3,
-        g0*g3*h0*h2 - g2*g3*h0*h2 - g0*g2*h0*h3 + g2*g3*h0*h3 + g0*g2*h2*h3 - g0*g3*h2*h3,
-        b1*b3*h1*h2 - b2*b3*h1*h2 - b1*b2*h1*h3 + b2*b3*h1*h3 + b1*b2*h2*h3 - b1*b3*h2*h3,
-        g1*g3*h1*h2 - g2*g3*h1*h2 - g1*g2*h1*h3 + g2*g3*h1*h3 + g1*g2*h2*h3 - g1*g3*h2*h3,
-
-        b2*g0*g1 - b1*g0*g2 + b1*g1*g2 - b2*g1*g2,
-        b3*g0*g1 - b1*g0*g3 + b1*g1*g3 - b3*g1*g3,
-        b3*g0*g2 - b2*g0*g3 + b2*g2*g3 - b3*g2*g3,
-        b2*h0*h1 - b1*h0*h2 + b1*h1*h2 - b2*h1*h2,
-        b3*h0*h1 - b1*h0*h3 + b1*h1*h3 - b3*h1*h3,
-        b3*h0*h2 - b2*h0*h3 + b2*h2*h3 - b3*h2*h3
-    ]
-*/
+end if;

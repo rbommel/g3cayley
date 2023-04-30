@@ -1,9 +1,12 @@
 /***
  * Exported intrinsics.
  *
+ * intrinsic CayleyOctadEighthPoint(O6::SeqEnum, O7::SeqEnum) -> SeqEnum
+ *   {On input two points in P3, return a third point such that the 5 points
+ *   (1:0:0:0), ..., (0:0:0:1), (1:1:1:1) and these 3 points form a Cayley Octad}
+ *
  * intrinsic CayleyOctadRelations(Plck::SeqEnum) -> SeqEnum
  *      {On input Plucker coordinates, return Cayley octad relations}
- *
  *
  * intrinsic CayleyTwistedCubicRelations(Plck::SeqEnum) -> SeqEnum
  *      {On input Plucker coordinates, return Cayley twisted cubic relations}
@@ -11,6 +14,21 @@
  ****************************************************************************/
 
 import "bblocks.m" : KeySets;
+
+
+intrinsic CayleyOctadEighthPoint(O6::SeqEnum, O7::SeqEnum) -> SeqEnum
+    {On input two points in P3, return a third point such that the 5 points
+    (1:0:0:0), ..., (0:0:0:1), (1:1:1:1) and these 3 points form a Cayley Octad}
+
+    a6, b6, c6, d6 := Explode(O6); a7, b7, c7, d7 := Explode(O7);
+
+    a8 := (b6*c7 - b6*d7 - c6*b7 + c6*d7 + d6*b7 - d6*c7) / (b6*c6*b7*d7 - b6*c6*c7*d7 - b6*d6*b7*c7 + b6*d6*c7*d7 + c6*d6*b7*c7 - c6*d6*b7*d7);
+    b8 := (a6*c7 - a6*d7 - c6*a7 + c6*d7 + d6*a7 - d6*c7) / (a6*c6*a7*d7 - a6*c6*c7*d7 - a6*d6*a7*c7 + a6*d6*c7*d7 + c6*d6*a7*c7 - c6*d6*a7*d7);
+    c8 := (b6*a7 - b6*d7 - a6*b7 + a6*d7 + d6*b7 - d6*a7) / (b6*a6*b7*d7 - b6*a6*a7*d7 - b6*d6*b7*a7 + b6*d6*a7*d7 + a6*d6*b7*a7 - a6*d6*b7*d7);
+    d8 := (b6*c7 - b6*a7 - c6*b7 + c6*a7 + a6*b7 - a6*c7) / (b6*c6*b7*a7 - b6*c6*c7*a7 - b6*a6*b7*c7 + b6*a6*c7*a7 + c6*a6*b7*c7 - c6*a6*b7*a7);
+
+    return [a8, b8, c8, d8];
+end intrinsic;
 
 /* Octad Relations */
 intrinsic CayleyOctadRelations(Plck::SeqEnum) -> SeqEnum
