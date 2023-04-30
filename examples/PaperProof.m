@@ -16,6 +16,8 @@ Alpha2bv1Case   := false; Alpha2bv2Case   := false;
 Chi1av1Case   := false; Chi1av2Case   := false; Chi1av3Case   := false;
 Chi2av1Case   := false; Chi2av2Case   := false;
 
+Phi1av1Case   := false; Phi1av2Case   := false;
+
 if ByDefault then
     RegularCase     := true;
 
@@ -24,12 +26,32 @@ if ByDefault then
 
     Chi1av1Case   := true; Chi1av2Case   := true; Chi1av3Case   := true;
     Chi2av1Case   := true; Chi2av2Case   := true;
+
+    Phi1av1Case   := true; Phi1av2Case   := true;
 end if;
 
 "";
 
 /* Toolbox */
-_, KeySets := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
+_, KS := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
+
+function vpt(S : KeySets := KS)
+    return Vector([ Max(0, #(K meet S) - 1) : K in KeySets]);
+end function;
+
+function vln(S : KeySets := KS)
+    return Vector([ Max(0, #(K meet S) - 2) : K in KeySets]);
+end function;
+
+function vpl(S : KeySets := KS)
+    return Vector([ Max(0, #(K meet S) - 3) : K in KeySets]);
+end function;
+
+function vmax(v1, v2)
+    w := v1;
+    for i := 1 to #Eltseq(v1) do w[i] := Max(v1[i], v2[i]); end for;
+    return w;
+end function;
 
 function AdHocVal(pol, P)
 
@@ -144,6 +166,8 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
 end procedure;
 
 /* Ring definitions  */
+KeySets := KS;
+
 Fld := Rationals();
 
 Poctad<
@@ -161,7 +185,6 @@ Foctad<
 
 if RegularCase then
 
-    /*** ABCD | EFGH ***/
     "Cremona action ABCD | EFGH on a regular octad";
 
     /* The octad */
@@ -201,12 +224,11 @@ end if;
 
 if Alpha1av1Case then
 
-    /*** ABCD | EFGH ***/
     "Cremona action ABCD | EFGH on Alpha_{1a}";
 
     /* The octad */
     tpO := "Alpha^AB_1a";
-    vO  := Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    vO  := vpt({1,2});
     O6 := [ 1, a1, a2, a3 ]; O7 := [ 1, a1+p*b1, a2+p*b2, a3+p*b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         O6,
@@ -221,7 +243,7 @@ if Alpha1av1Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^AB_1a";
-    vOc  := Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    vOc  := vpt({1,2});
     _Oc := CremonaImage(_O, [5,6,7,8, 4]);
 
     /* Check */
@@ -231,12 +253,11 @@ end if;
 
 if Alpha1av2Case then
 
-    /*** ACDE | BFGH ***/
     "Cremona action ACDE | BFGH on Alpha_{1a}";
 
     /* The octad */
     tpO := "Alpha^AB_1a";
-    vO  := Vector([ Max(0, #(K meet {1,2}) - 1) : K in KeySets ]);
+    vO  := vpt({1,2});
     O6 := [ 1, p*a1, p*a2, p*a3 ]; O7 := [ 1, b1, b2, b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         [ 1, 0,  0,  0 ],
@@ -251,7 +272,7 @@ if Alpha1av2Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^BCDE_2a";
-    vOc  := Vector([ Max(0, #(K meet {2,3,4,5}) - 3) + Max(0, #(K meet {1,6,7,8}) - 3) : K in KeySets ]);
+    vOc  := vpl({2,3,4,5}) + vpl({1,6,7,8});
     _Oc := CremonaImage(_O, [1,3,4,5, 6]);
 
     /* Check */
@@ -267,12 +288,11 @@ end if;
 
 if Alpha2bv1Case then
 
-    /*** ABCD | EFGH ***/
     "Cremona action ABCD | EFGH on Alpha_{2b}";
 
     /* The octad */
     tpO := "Alpha^ABCD_2b";
-    vO  := Vector([ Max(0, #(K meet {1,2,3,4}) - 1) + Max(0, #(K meet {1,2,3,4}) - 3) : K in KeySets ]);
+    vO  := vpt({1,2,3,4}) + vpl({1,2,3,4});
     O6 := [ 1, a1*p+1, a2*p+1, a3*p+1 ]; O7 := [ 1, b1*p+1, b2*p+1, b3*p+1 ]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         O6,
@@ -287,7 +307,7 @@ if Alpha2bv1Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^ABCD_2b";
-    vOc  := Vector([ Max(0, #(K meet {1,2,3,4}) - 1) + Max(0, #(K meet {1,2,3,4}) - 3) : K in KeySets ]);
+    vOc  := vpt({1,2,3,4}) + vpl({1,2,3,4});
     _Oc := CremonaImage(_O, [5,6,7,8, 4]);
 
     /* Check */
@@ -297,12 +317,11 @@ end if;
 
 if Alpha2bv2Case then
 
-    /* ABEF | CDGH ***/
     "Cremona action ABEF | CDGH on Alpha_{2b}";
 
     /* The octad */
     tpO := "Alpha^ABCD_2b";
-    vO  := Vector([ Max(0, #(K meet {1,2,3,4}) - 3) + Max(0, #(K meet {5,6,7,8}) - 3) : K in KeySets ]);
+    vO  := vpl({1,2,3,4})+vpl({5,6,7,8});
     O6 :=  [ 0+p, a1, a2, a3 ]; O7 := [ 1, b1, b2, b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         O6,
@@ -317,7 +336,7 @@ if Alpha2bv2Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^AF_2a";
-    vOc  := Vector([ Max(0, #(K meet {1,6}) - 1) : K in KeySets ]);
+    vOc  := vpt({1,6});
     _Oc := CremonaImage(_O, [6,2,3,4, 5]);
 
     /* Check */
@@ -337,17 +356,11 @@ end if;
 
 if Chi1av1Case then
 
-    /*** ABCH | DEFG ***/
     "Cremona action ABCD | EFGH on Chi_{1a}";
 
     /* The octad */
     tpO := "Chi^AB|CFG|DEH_1a";
-    vO  := Vector([
-        Max(
-          Max(0, #(K meet {3,6,7}) - 2) + Max(0, #(K meet {4,5,8}) - 2),
-          Max(0, #(K meet {3,4,5,6,7,8}) - 3)
-        )
-        : K in KeySets ]);
+    vO  := vmax( vln({3,6,7}) + vln({4,5,8}), vpl({3,4,5,6,7,8}) );
     O6 := [ 1, 1+a1*p, a2, a3 ]; O7 := [ 1, 1+p*b1, b2, a3 + p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         [ 1, 0, 0, 0 ],
@@ -362,12 +375,7 @@ if Chi1av1Case then
 
     /* It's Cremona image */
     tpOc := "Chi^AB|CFG|DEH_1a";
-    vOc  := Vector([
-        Max(
-          Max(0, #(K meet {3,6,7}) - 2) + Max(0, #(K meet {4,5,8}) - 2),
-          Max(0, #(K meet {3,4,5,6,7,8}) - 3)
-        )
-        : K in KeySets ]);
+    vOc  := vmax( vln({3,6,7}) + vln({4,5,8}), vpl({3,4,5,6,7,8}) );
     _Oc := CremonaImage(_O, [1,2,3,8,5]);
 
     /* Check */
@@ -377,17 +385,11 @@ end if;
 
 if Chi1av2Case then
 
-    /*** BCFG | ADEH ***/
     "Cremona action BCDE | AFGH on Chi_{1a}";
 
     /* The octad */
     tpO := "Chi^AB|CFG|DEH_1a";
-    vO  := Vector([
-        Max(
-          Max(0, #(K meet {3,6,7}) - 2) + Max(0, #(K meet {4,5,8}) - 2),
-          Max(0, #(K meet {3,4,5,6,7,8}) - 3)
-        )
-        : K in KeySets ]);
+    vO  := vmax( vln({3,6,7}) + vln({4,5,8}), vpl({3,4,5,6,7,8}) );
     O6 := [ 1, 1+a1*p, a2, a3 ]; O7 := [ 1, 1+p*b1, b2, a3 + p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         [ 1, 0, 0, 0 ],
@@ -402,12 +404,7 @@ if Chi1av2Case then
 
     /* It's Cremona image */
     tpOc := "Chi^AB|CFG|DEH_1c";
-    vOc  := Vector([
-        Max(
-          Max(0, #(K meet {1,2,4,5,8}) - 2) + Max(0, #(K meet {4,5,8}) - 2),
-          Max(0, #(K meet {4,5,8}) - 1)
-        )
-        : K in KeySets ]);
+    vOc  := vmax( vln({1,2,4,5,8}) + vln({4,5,8}), vpt({4,5,8}) );
     _Oc := CremonaImage(_O, [2,3,6,7,5]);
 
     /* Check */
@@ -417,17 +414,11 @@ end if;
 
 if Chi1av3Case then
 
-    /*** ACFH | BDEG ***/
     "Cremona action ACFH | BDEG on Chi_{1a}";
 
     /* The octad */
     tpO := "Chi^AB|CFG|DEH_1a";
-    vO  := Vector([
-        Max(
-          Max(0, #(K meet {3,6,7}) - 2) + Max(0, #(K meet {4,5,8}) - 2),
-          Max(0, #(K meet {3,4,5,6,7,8}) - 3)
-        )
-        : K in KeySets ]);
+    vO  := vmax( vln({3,6,7}) + vln({4,5,8}), vpl({3,4,5,6,7,8}) );
     O6 := [ 1, 1+a1*p, a2, a3 ]; O7 := [ 1, 1+p*b1, b2, a3 + p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
     _O := Parent([[Foctad|]])![
         [ 1, 0, 0, 0 ],
@@ -442,16 +433,14 @@ if Chi1av3Case then
 
     /* It's Cremona image */
     tpOc := "Chi^GH|ADE|BCF_1c";
-    vOc  := Vector([
-        Max(
-          Max(0, #(K meet {7,8,2,3,6}) - 2) + Max(0, #(K meet {2,3,6}) - 2),
-          Max(0, #(K meet {2,3,6}) - 1)
-        )
-        : K in KeySets ]);
+    vOc  := vmax( vln({7,8,2,3,6}) + vln({2,3,6}), vpt({2,3,6}) );
     _Oc := CremonaImage(_O, [2,4,5,7,1]);
 
     /* Check */
     ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+    "----------------------";
+    "";
 
 end if;
 
@@ -460,15 +449,12 @@ end if;
 
 if Chi2av1Case then
 
-    /*** ABCD | EFGH ***/
     "Cremona action ABCD | EFGH on Chi_{2a}";
 
     /* The octad */
     tpO := "Chi^ABC_2a";
-    vO  := Vector([ Max(0, #(K meet {4,5,6,7,8}) - 2) + Max(0, #(K meet {4,5,6,7,8}) - 3) : K in KeySets ]);
-
+    vO  := vln({4,5,6,7,8}) + vpl({4,5,6,7,8});
     O6 := [ 1, 1+a1*p, 1+a2*p, a3 ]; O7 := [ 1, 1+p*b1, 1 + p*(a2*b1/a1) + p^2*b2, b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
-
     _O := Parent([[Foctad|]])![
         [ 1, 0, 0, 0 ],
         [ 0, 1, 0, 0 ],
@@ -482,7 +468,7 @@ if Chi2av1Case then
 
     /* It's Cremona image */
     tpOc := "Chi^ABC_2a";
-    vOc  := Vector([ Max(0, #(K meet {4,5,6,7,8}) - 2) + Max(0, #(K meet {4,5,6,7,8}) - 3) : K in KeySets ]);
+    vOc  := vln({4,5,6,7,8}) + vpl({4,5,6,7,8});
     _Oc := CremonaImage(_O, [1,2,3,4,5]);
 
     /* Check */
@@ -493,12 +479,11 @@ end if;
 
 if Chi2av2Case then
 
-    /*** ABDE | CFGH ***/
-    "Cremona action ABDE | CFGH on Chi_{2a}";
+    "Cremona action ABDE | CFGH on Chi_{1a}";
 
     /* The octad */
-    tpO := "Chi^ABC_2a";
-    vO  := Vector([ Max(0, #(K meet {4,5,6,7,8}) - 2) + Max(0, #(K meet {4,5,6,7,8}) - 3) : K in KeySets ]);
+    tpO := "Chi^ (AB|GH)|(CD|EF) _1a";
+    vO  := vln({4,5,6,7,8}) + vpl({4,5,6,7,8});
 
     O6 := [ 1, 1+a1*p, 1+a2*p, a3 ]; O7 := [ 1, 1+p*b1, 1 + p*(a2*b1/a1) + p^2*b2, b3 ]; O8 := CayleyOctadEighthPoint(O6, O7);
 
@@ -515,12 +500,7 @@ if Chi2av2Case then
 
     /* It's Cremona image */
     tpOc := "Chi^AB|CFG|DEH_1a";
-    vOc  := Vector([
-        Max(
-          Max(0, #(K meet {3,6,7}) - 2) + Max(0, #(K meet {4,5,8}) - 2),
-          Max(0, #(K meet {3,4,5,6,7,8}) - 3)
-        )
-        : K in KeySets ]);
+    vOc  := vmax( vln({3,6,7}) + vln({4,5,8}), vpl({3,4,5,6,7,8}) );
     _Oc := CremonaImage(_O, [1,2,6,7,5]);
 
     /* Check */
@@ -528,5 +508,77 @@ if Chi2av2Case then
 
     "----------------------";
     "";
+
+end if;
+
+/*
+ * Section 4.3 - Cremona action on phi blocks
+ ********************************************/
+
+/*** Phi_{1} case ***/
+/********************/
+
+if Phi1av1Case then
+
+    "Cremona action ABEF | CDGH on Phi_{1a}";
+
+    /* The octad */
+    tpO := "Phi^AB|GH||CD|EF_1a";
+    vO  :=
+        vln({7,8,3,4}) + vln({7,8,5,6}) +
+        vpl({1,2,7,8}) + vpl({3,4,5,6}) ;
+    O6 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ]; O7 := [ 0+p*b1, 0+p*b2, 1, b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^ABGH_3a";
+    vOc  := vln({1, 2, 7, 8}) + vpl({1, 2, 7, 8}) + vpl({3, 4, 5, 6});
+    _Oc := CremonaImage(_O, [1,2,5,6,3]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Phi1av2Case then
+
+    "Cremona action ABGH | CDEF on Phi_{1a}";
+
+    /* The octad */
+    tpO := "Phi^AB|GH||CD|EF_1a";
+    vO  :=
+        vln({7,8,3,4}) + vln({7,8,5,6}) +
+        vpl({1,2,7,8}) + vpl({3,4,5,6}) ;
+    O6 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ]; O7 := [ 0+p*b1, 0+p*b2, 1, b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^AB|GH||CD|EF_1b";
+    vOc  := vmax(
+        vpt({1, 2}) + vpt({7, 8}),
+        vpl({1, 2, 7, 8, 3, 4}) + vpl({1, 2, 7, 8, 5, 6})
+        );
+    _Oc := CremonaImage(_O, [3,4,5,6,1]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
 
 end if;
