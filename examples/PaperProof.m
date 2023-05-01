@@ -16,7 +16,8 @@ Alpha2bv1Case   := false; Alpha2bv2Case   := false;
 Chi1av1Case   := false; Chi1av2Case   := false; Chi1av3Case   := false;
 Chi2av1Case   := false; Chi2av2Case   := false;
 
-Phi1av1Case   := false; Phi1av2Case   := false;
+Phi1av1Case   := false; Phi1av2Case   := false; Phi1av3Case   := false; Phi1av4Case   := false;
+Phi2av1Case   := false; Phi2av2Case   := false; Phi2av3Case   := false; Phi2av4Case   := false;
 
 if ByDefault then
     RegularCase     := true;
@@ -27,7 +28,8 @@ if ByDefault then
     Chi1av1Case   := true; Chi1av2Case   := true; Chi1av3Case   := true;
     Chi2av1Case   := true; Chi2av2Case   := true;
 
-    Phi1av1Case   := true; Phi1av2Case   := true;
+    Phi1av1Case   := true; Phi1av2Case   := true; Phi1av3Case   := true; Phi1av4Case   := true;
+    Phi2av1Case   := true; Phi2av2Case   := true; Phi2av3Case   := true; Phi2av4Case   := true;
 end if;
 
 "";
@@ -108,8 +110,9 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
     /* It's valuation data */
     PlckO, KeySets := PluckerCoordinates(O);
 
-    VPlO := Vector([ AdHocVal(e, P) eq Infinity() select 1 else AdHocVal(e, P): e in PlckO ]);
+    VPlO := Vector([ AdHocVal(e, P) eq Infinity() select 1000 else AdHocVal(e, P): e in PlckO ]);
     "\t_ Valuation data of O  equal to a " cat tpO cat "-block:", VPlO eq vO;
+    // Eltseq(VPlO); Weight(VPlO);
 
     /* It's Cremona image */
     Oc := AdHocNormalize(_Oc, P);
@@ -117,8 +120,9 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
     /* It's valuation data */
     PlckOc, KeySets := PluckerCoordinates(Oc);
 
-    VPlOc := Vector([ AdHocVal(e, P) eq Infinity() select 1 else AdHocVal(e, P): e in PlckOc ]);
+    VPlOc := Vector([ AdHocVal(e, P) eq Infinity() select 1000 else AdHocVal(e, P): e in PlckOc ]);
     "\t_ Valuation data of O' equal to a " cat tpOc cat "-block:", VPlOc eq vOc;
+    // Eltseq(VPlOc); Weight(VPlOc);
 
     /* Relations that make O degenerate */
     OEquations := [];
@@ -577,6 +581,206 @@ if Phi1av2Case then
         vpl({1, 2, 7, 8, 3, 4}) + vpl({1, 2, 7, 8, 5, 6})
         );
     _Oc := CremonaImage(_O, [3,4,5,6,1]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Phi1av3Case then
+
+    "Cremona action ABCG | DEFH on Phi_{1a}";
+
+    /* The octad */
+    tpO := "Phi^AB|GH||CD|EF_1a";
+    vO  :=
+        vln({7,8,3,4}) + vln({7,8,5,6}) +
+        vpl({1,2,7,8}) + vpl({3,4,5,6}) ;
+    O6 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ]; O7 := [ 0+p*b1, 0+p*b2, 1, b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^ABD|EFG_2a";
+    vOc  := vmax(
+        vln({ 1, 2, 4 }) + vln({ 5, 6, 7 }),
+        vpl({ 1, 2, 4, 3, 8 }) + vpl({ 5, 6, 7, 3, 8 })
+        );
+    _Oc := CremonaImage(_O, [1,2,3,7,5]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Phi1av4Case then
+
+    "Cremona action ACEG | BDFH on Phi_{1a}";
+
+    /* The octad */
+    tpO := "Phi^AB|GH||CD|EF_1a";
+    vO  :=
+        vln({7,8,3,4}) + vln({7,8,5,6}) +
+        vpl({1,2,7,8}) + vpl({3,4,5,6}) ;
+    O6 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ]; O7 := [ 0+p*b1, 0+p*b2, 1, b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^AH|BG||CE|DF_1a";
+    vOc  :=
+        vln({1,8,3,6}) + vln({1,8,4,5}) +
+        vpl({1,8, 2,7}) + vpl({3,6,4,5});
+    _Oc := CremonaImage(_O, [1,3,5,7,2]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+    "----------------------";
+    "";
+
+end if;
+
+if Phi2av1Case then
+
+    "Cremona action ABDH | CEFG on Phi_{2a}";
+
+    /* The octad */
+    tpO := "Phi^BDF|CEG_2a";
+    vO  := vmax(
+        vln({ 2, 4, 6 })       + vln({ 3, 5, 7}),
+        vpl({ 2, 4, 6, 1, 8 }) + vpl({ 3, 5, 7, 1, 8 })
+        );
+    O6 := [ 0+p*a1, 1, a2*p, a3 ]; O7 := [ 1, 1+p*b1, b2, 1+p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^BDF|CEG_2a";
+    vOc  := vln({ 3,5,7, 1 }) + vln({ 3,5,7, 8 }) + vpl({ 2,4,6, 3,5,7 });
+    _Oc := CremonaImage(_O, [1,2,4,8, 5]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Phi2av2Case then
+
+    "Cremona action ABDF | CEGH on Phi_{2a}";
+
+    /* The octad */
+    tpO := "Phi^BDF|CEG_2a";
+    vO  := vmax(
+        vln({ 2, 4, 6 })       + vln({ 3, 5, 7}),
+        vpl({ 2, 4, 6, 1, 8 }) + vpl({ 3, 5, 7, 1, 8 })
+        );
+    O6 := [ 0+p*a1, 1, a2*p, a3 ]; O7 := [ 1, 1+p*b1, b2, 1+p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^BDF|CEG_2a";
+    vOc  := (
+        vln({5,8, 3,7}) + vln({5,8, 1,6}) +
+        vpl({2,4, 5,8}) + vpl({3,7, 1,6}) );
+    _Oc := CremonaImage(_O, [1,2,4,5, 3]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Phi2av3Case then
+
+    "Cremona action ABFH | CDEG on Phi_{2a}";
+
+    /* The octad */
+    tpO := "Phi^BDF|CEG_2a";
+    vO  := vmax(
+        vln({ 2, 4, 6 })       + vln({ 3, 5, 7}),
+        vpl({ 2, 4, 6, 1, 8 }) + vpl({ 3, 5, 7, 1, 8 })
+        );
+    O6 := [ 0+p*a1, 1, a2*p, a3 ]; O7 := [ 1, 1+p*b1, b2, 1+p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^BDF|CEG_2b";
+    vOc  :=  vpt({1,8}) + vln({2,4,6, 1}) + vln({2,4,6, 8});
+    _Oc := CremonaImage(_O, [3,4,5,7, 1]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+end if;
+
+if Phi2av4Case then
+
+    "Cremona action ABCH | DEFG on Phi_{2a}";
+
+    /* The octad */
+    tpO := "Phi^BDF|CEG_2a";
+    vO  := vmax(
+        vln({ 2, 4, 6 })       + vln({ 3, 5, 7}),
+        vpl({ 2, 4, 6, 1, 8 }) + vpl({ 3, 5, 7, 1, 8 })
+        );
+    O6 := [ 0+p*a1, 1, a2*p, a3 ]; O7 := [ 1, 1+p*b1, b2, 1+p*b3]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^CDF|BEG_2c";
+    vOc  :=  vln({3,4,6,1  }) + vln({3,4,6, 8}) + vpl({ 3,4,6, 2,5,7 });
+    _Oc := CremonaImage(_O, [1,2,3,8,5]);
 
     /* Check */
     ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
