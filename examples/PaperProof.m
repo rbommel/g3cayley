@@ -483,7 +483,7 @@ end if;
 
 if Chi2av2Case then
 
-    "Cremona action ABDE | CFGH on Chi_{1a}";
+    "Cremona action ABDE | CFGH on Chi_{2a}";
 
     /* The octad */
     tpO := "Chi^ (AB|GH)|(CD|EF) _1a";
