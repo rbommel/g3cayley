@@ -19,6 +19,8 @@ Chi2av1Case   := false; Chi2av2Case   := false;
 Phi1av1Case   := false; Phi1av2Case   := false; Phi1av3Case   := false; Phi1av4Case   := false;
 Phi2av1Case   := false; Phi2av2Case   := false; Phi2av3Case   := false; Phi2av4Case   := false;
 
+Phi3av1Case   := false;
+
 if ByDefault then
     RegularCase     := true;
 
@@ -30,6 +32,8 @@ if ByDefault then
 
     Phi1av1Case   := true; Phi1av2Case   := true; Phi1av3Case   := true; Phi1av4Case   := true;
     Phi2av1Case   := true; Phi2av2Case   := true; Phi2av3Case   := true; Phi2av4Case   := true;
+
+    Phi3av1Case   := true;
 end if;
 
 "";
@@ -112,7 +116,7 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
 
     VPlO := Vector([ AdHocVal(e, P) eq Infinity() select 1000 else AdHocVal(e, P): e in PlckO ]);
     "\t_ Valuation data of O  equal to a " cat tpO cat "-block:", VPlO eq vO;
-    // Eltseq(VPlO); Weight(VPlO);
+    //Eltseq(VPlO); Weight(VPlO);
 
     /* It's Cremona image */
     Oc := AdHocNormalize(_Oc, P);
@@ -122,7 +126,7 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
 
     VPlOc := Vector([ AdHocVal(e, P) eq Infinity() select 1000 else AdHocVal(e, P): e in PlckOc ]);
     "\t_ Valuation data of O' equal to a " cat tpOc cat "-block:", VPlOc eq vOc;
-    // Eltseq(VPlOc); Weight(VPlOc);
+    //Eltseq(VPlOc); Weight(VPlOc);
 
     /* Relations that make O degenerate */
     OEquations := [];
@@ -781,6 +785,38 @@ if Phi2av4Case then
     tpOc := "Phi^CDF|BEG_2c";
     vOc  :=  vln({3,4,6,1  }) + vln({3,4,6, 8}) + vpl({ 3,4,6, 2,5,7 });
     _Oc := CremonaImage(_O, [1,2,3,8,5]);
+
+    /* Check */
+    ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
+
+    "----------------------";
+    "";
+
+end if;
+
+if Phi3av1Case then
+
+    "Cremona action ABGH | CDEF on Phi_{3}";
+
+    /* The octad */
+    tpO := "Phi^ABGH_3a";
+    vO  := ( vln({1, 2, 7, 8}) + vpl({1, 2, 7, 8}) + vpl({3, 4, 5, 6}) );
+    O6 := [ a3, a3+p*a1, a2, 1 ]; O7 := [ b3, b1, p*b2*a2*(a3-1), p*b2*(a3-a2) ]; O8 := CayleyOctadEighthPoint(O6, O7);
+    _O := Parent([[Foctad|]])![
+        [ 1, 0, 0, 0 ],
+        [ 0, 1, 0, 0 ],
+        [ 0, 0, 1, 0 ],
+        [ 0, 0, 0, 1 ],
+        [ 1, 1, 1, 1 ],
+        O6,
+        O7,
+        O8
+        ];
+
+    /* It's Cremona image */
+    tpOc := "Phi^ABGH_3b";
+    vOc  := ( vpt({1, 2, 7, 8}) + vln({1, 2, 7, 8}) + vpl({1, 2, 7, 8}) );
+    _Oc := CremonaImage(_O, [3,4,5,6,1]);
 
     /* Check */
     ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc);
