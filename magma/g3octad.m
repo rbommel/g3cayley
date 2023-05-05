@@ -8,7 +8,7 @@
  * intrinsic CayleyOctadRelations(Plck::SeqEnum) -> SeqEnum
  *      {On input Plucker coordinates, return Cayley octad relations}
  *
- * intrinsic CayleyTwistedCubicRelations(Plck::SeqEnum) -> SeqEnum
+ * intrinsic CayleyOctadTwistedCubicRelations(Plck::SeqEnum) -> SeqEnum
  *      {On input Plucker coordinates, return Cayley twisted cubic relations}
  *
  ****************************************************************************/
