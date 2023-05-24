@@ -26,7 +26,7 @@ KeySets := [
     {1,2,4,5}, {2,3,4,7}, {2,3,4,6}, {2,3,4,8}
 
     ];
-    
+
 v := AssociativeArray();
 v := AssociativeArray(); for i := 1 to #KeySets do v[KeySets[i]] := V70.i; end for;
 vPt := AssociativeArray();
@@ -73,3 +73,80 @@ assert(&join[IndependentFives(v) : v in TB[{1,2,3}] ] eq {* S : S in Subsets({1.
 assert(&join[IndependentFives(v) : v in CA[{{{1,2},{3,4}},{{5,6},{7,8}}}] ] eq {* S : S in Subsets({1..8},5) *});
 assert(&join[IndependentFives(v) : v in CB[<{1,2}, {{3,4,5},{6,7,8}}>] ] eq {* S : S in Subsets({1..8},5) *});
 assert(&join[IndependentFives(v) : v in CC[{{1,2,3,4},{5,6,7,8}}] ] eq {* S : S in Subsets({1..8},5) *});
+
+
+/*
+ * Check that building blocks of octads on a twisted cubic curve remain twisted on a PGL orbit
+ ***/
+function SystemInAdditiveForm(SYS)
+    M := Matrix(Rationals(),  #KeySets, #SYS,[]);
+    for i := 1 to #SYS do
+        Cf, Mn := CoefficientsAndMonomials(SYS[i]);
+        for j := 1 to #KeySets do
+            if Exponents(Mn[1])[j] eq 1 then M[j,i] := Cf[1]; end if;
+            if Exponents(Mn[2])[j] eq 1 then M[j,i] := Cf[2]; end if;
+        end for;
+    end for;
+    return M;
+end function;
+
+/*  Plucker coordinates, uniformising element */
+Fpl<[pl]> := PolynomialRing(Rationals(), [ 1 : i in [1..70+1] ] );
+
+pi := pl[70+1]; AssignNames(~Fpl,
+    [ "p" cat &cat[IntegerToString(j) : j in KeySets[i] ] :
+    i in [1..70]] cat ["pi"]
+    );
+
+/* Cayley relations of a regular octad, in addition form */
+CayleyRels := SystemInAdditiveForm(CayleyOctadRelations([ pl[i]  : i in [1..70] ]));
+
+/* Twisted cubic relations of a regular octad, in addition form */
+TwistedRels := SystemInAdditiveForm(CayleyOctadTwistedCubicRelations([ pl[i]  : i in [1..70] ]));
+
+/* Let's go */
+for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
+
+    type := [ Tw,  Pl,  TA, TB,  CA, CB, CC ][t];
+
+    "Checking Building Blocks",
+        [ "alpha_1", "alpha_2",  "chi_a", "chi_b", "chi_c",  "phi_a", "phi_c" ][t], "...";
+
+    for key in Keys(type) do
+        lst := [];
+
+        for vO in type[key] do
+            /* Plucker coordinates with this valuation data */
+            PlO := [ pl[i]*pi^(Integers()!vO[i]) : i in [1..70] ];
+
+            /* Its Twisted cubic relations*/
+            TwO := CayleyOctadTwistedCubicRelations(PlO);
+
+            /* Is this system homogenous in pi,
+               otherwise skip it (no twisted cubic octad exists with this block) */
+            if t in [ 2, 3, 5, 6 ] then
+                assert  { L[1] eq L[2] : L in [ [Degree(T, pi) : T in Terms(E) ] : E in TwO] } ne {true};
+            else
+                assert { L[1] eq L[2] : L in [ [Degree(T, pi) : T in Terms(E) ] : E in TwO] } eq {true};
+
+                dmin := Min([ Degree(E, pi) : E in TwO ]);
+
+                /* Restriction to the valuation 0 relations  */
+                TwOVal0 := Transpose(Matrix([ Transpose(TwistedRels)[i] : i in [1..#TwO] | Degree(TwO[i], pi) eq dmin ]));
+                /* Cayley and Twisted cubic relations of low degree */
+                Krn := Kernel(HorizontalJoin(CayleyRels, TwOVal0));
+
+                Append(~lst, Krn);
+            end if;
+
+        end for;
+
+        /* Check that these subspaced are the same for each key */
+        if #lst gt 0 then
+            assert { lst[i] eq lst[j] : i, j in [1..#lst] | j gt i} eq {true};
+        end if;
+
+    end for;
+
+    "... done"; "";
+end for;
