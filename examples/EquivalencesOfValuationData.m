@@ -98,10 +98,10 @@ pi := pl[70+1]; AssignNames(~Fpl,
     i in [1..70]] cat ["pi"]
     );
 
-/* Cayley relations of a regular octad, in addition form */
+/* Cayley relations of a regular octad, in additive form */
 CayleyRels := SystemInAdditiveForm(CayleyOctadRelations([ pl[i]  : i in [1..70] ]));
 
-/* Twisted cubic relations of a regular octad, in addition form */
+/* Twisted cubic relations of a regular octad, in additive form */
 TwistedRels := SystemInAdditiveForm(CayleyOctadTwistedCubicRelations([ pl[i]  : i in [1..70] ]));
 
 /* Let's go */
@@ -131,18 +131,19 @@ for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
 
                 dmin := Min([ Degree(E, pi) : E in TwO ]);
 
-                /* Restriction to the valuation 0 relations  */
-                TwOVal0 := Transpose(Matrix([ Transpose(TwistedRels)[i] : i in [1..#TwO] | Degree(TwO[i], pi) eq dmin ]));
-                /* Cayley and Twisted cubic relations of low degree */
-                Krn := Kernel(HorizontalJoin(CayleyRels, TwOVal0));
+                /* Restriction to the relations of valuation dmin */
+                TwOValMin := Transpose(Matrix([ Transpose(TwistedRels)[i] : i in [1..#TwO] | Degree(TwO[i], pi) eq dmin ]));
+                /* Let us extract a basis */
+                Krn := Kernel(HorizontalJoin(CayleyRels, TwOValMin));
 
                 Append(~lst, Krn);
             end if;
 
         end for;
 
-        /* Check that these subspaced are the same for each key */
+
         if #lst gt 0 then
+            /* Check that these subspaces are the same for each entry */
             assert { lst[i] eq lst[j] : i, j in [1..#lst] | j gt i} eq {true};
         end if;
 
