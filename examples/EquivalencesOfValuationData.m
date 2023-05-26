@@ -110,7 +110,9 @@ for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
     type := [ Tw,  Pl,  TA, TB,  CA, CB, CC ][t];
 
     "Checking Building Blocks",
-        [ "alpha_1", "alpha_2",  "chi_a", "chi_b", "chi_c",  "phi_a", "phi_c" ][t], "...";
+        [ "alpha_1", "alpha_2",  "chi_a", "chi_b", "chi_c",  "phi_a", "phi_b" ][t], "...";
+
+    KerDims := {**};
 
     for key in Keys(type) do
         lst := [];
@@ -124,10 +126,12 @@ for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
 
             /* Is this system homogenous in pi,
                otherwise skip it (no twisted cubic octad exists with this block) */
+            TermDegrees :=  [ [Degree(T, pi) : T in Terms(E) ] : E in TwO ];
+
             if t in [ 2, 3, 5, 6 ] then
-                assert  { L[1] eq L[2] : L in [ [Degree(T, pi) : T in Terms(E) ] : E in TwO] } ne {true};
+                assert { L[1] eq L[2] : L in TermDegrees } ne {true};
             else
-                assert { L[1] eq L[2] : L in [ [Degree(T, pi) : T in Terms(E) ] : E in TwO] } eq {true};
+                assert { L[1] eq L[2] : L in TermDegrees } eq {true};
 
                 dmin := Min([ Degree(E, pi) : E in TwO ]);
 
@@ -137,6 +141,7 @@ for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
                 Krn := Kernel(HorizontalJoin(CayleyRels, TwOValMin));
 
                 Append(~lst, Krn);
+                Include(~KerDims, Dimension(Krn));
             end if;
 
         end for;
@@ -149,5 +154,7 @@ for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
 
     end for;
 
+    "Dimensions are", KerDims;
     "... done"; "";
+
 end for;

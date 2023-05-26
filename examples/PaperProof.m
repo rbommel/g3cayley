@@ -116,7 +116,6 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
 
     VPlO := Vector([ AdHocVal(e, P) eq Infinity() select 1000 else AdHocVal(e, P): e in PlckO ]);
     "\t_ Valuation data of O  equal to a " cat tpO cat "-block:", VPlO eq vO;
-    // Eltseq(VPlO); Weight(VPlO);
     assert VPlO eq vO;
 
     /* It's Cremona image */
@@ -127,10 +126,9 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
 
     VPlOc := Vector([ AdHocVal(e, P) eq Infinity() select 1000 else AdHocVal(e, P): e in PlckOc ]);
     "\t_ Valuation data of O' equal to a " cat tpOc cat "-block:", VPlOc eq vOc;
-    // Eltseq(VPlOc); Weight(VPlOc);
     assert VPlOc eq vOc;
 
-    /* Relations that make O degenerate */
+    /* Relations that would lead to higher valuation data for O */
     OEquations := [];
     for i := 1 to #KeySets do
         v, e := AdHocVal(PlckO[i], P);
@@ -142,7 +140,7 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
         join
         &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Denominator(OEquations[i])]>)} : i in [1..70] | PlckO[i] ne 0 };
 
-    /* Relations that make Oc degenerate */
+    /* Relations that would lead to higher valuation data for Oc */
     OcEquations := [];
     for i := 1 to #KeySets do
         v, e := AdHocVal(PlckOc[i], P);
@@ -154,7 +152,7 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
         join
         &join{ { Basis(rd) : rd in  RadicalDecomposition(ideal<Poctad|[Denominator(OcEquations[i])]>)} : i in [1..70] | PlckOc[i] ne 0 };
 
-    /* When PclkOc degenerate while Plck does not ? */
+    /* Can we have higher valuations for Oc, but not for O ? */
     BadCases := Sort(Setseq(OcDegenerate diff ODegenerate));
 
     "\t_ Number of bad cases to examine:", #BadCases;
