@@ -1,6 +1,9 @@
 /* Computational proofs of some results of [Bom+23].
 
   [Bom+23] R. van Bommel, J. Docking, V. Dokchitser, R. Lercier and E. Lorenzo García, Reduction of plane quartics and Cayley octads, arXiv:xxx.
+
+   This script assumes that the spec file "g3cayley/magma/spec" is loaded
+   at magma startup (in the .magmarc file)
 */
 
 /* Checking flags, set the one you want to true.
@@ -38,19 +41,20 @@ end if;
 
 "";
 
-/* Toolbox */
-_, KS := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
+/* Toolbox
+ *********/
+_, KeySets := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
 
-function vpt(S : KeySets := KS)
-    return Vector([ Max(0, #(K meet S) - 1) : K in KeySets]);
+function vPt(S : KS := KeySets)
+    return Vector([ Max(0, #(K meet S) - 1) : K in KS]);
 end function;
 
-function vln(S : KeySets := KS)
-    return Vector([ Max(0, #(K meet S) - 2) : K in KeySets]);
+function vLn(S : KS := KeySets)
+    return Vector([ Max(0, #(K meet S) - 2) : K in KS]);
 end function;
 
-function vpl(S : KeySets := KS)
-    return Vector([ Max(0, #(K meet S) - 3) : K in KeySets]);
+function vPl(S : KS := KeySets)
+    return Vector([ Max(0, #(K meet S) - 3) : K in KS]);
 end function;
 
 function vmax(v1, v2)
@@ -164,8 +168,6 @@ procedure ResultChecking(tpO, vO, _O, tpOc, vOc, _Oc)
 end procedure;
 
 /* Ring definitions  */
-KeySets := KS;
-
 Fld := Rationals();
 
 Poctad<
@@ -226,7 +228,7 @@ if Alpha1av1Case then
 
     /* The octad */
     tpO := "Alpha^AB_1a";
-    vO  := vpt({1,2});
+    vO  := vPt({1,2});
     O1 := [ 1, a1, a2, a3 ];
     O2 := [ 1, a1+p*b1, a2+p*b2, a3+p*b3 ];
     O3 := CayleyOctadEighthPoint(O1, O2);
@@ -243,7 +245,7 @@ if Alpha1av1Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^AB_1a";
-    vOc  := vpt({1,2});
+    vOc  := vPt({1,2});
     _Oc := CremonaImage(_O, [ 5,6,7,8, 4 ]);
 
     /* Check */
@@ -257,7 +259,7 @@ if Alpha1av2Case then
 
     /* The octad */
     tpO := "Alpha^AB_1a";
-    vO  := vpt({1,2});
+    vO  := vPt({1,2});
     O2 := [ 1, p*a1, p*a2, p*a3 ];
     O7 := [ 1, b1, b2, b3 ];
     O8 := CayleyOctadEighthPoint(O2, O7);
@@ -274,7 +276,7 @@ if Alpha1av2Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^BCDE_2a";
-    vOc  := vpl({2,3,4,5}) + vpl({1,6,7,8});
+    vOc  := vPl({2,3,4,5}) + vPl({1,6,7,8});
     _Oc := CremonaImage(_O, [ 1,3,4,5, 6]);
 
     /* Check */
@@ -294,7 +296,7 @@ if Alpha2bv1Case then
 
     /* The octad */
     tpO := "Alpha^ABCD_2b";
-    vO  := vpt({1,2,3,4}) + vpl({1,2,3,4});
+    vO  := vPt({1,2,3,4}) + vPl({1,2,3,4});
     O1 := [ 1, a1*p+1, a2*p+1, a3*p+1 ];
     O2 := [ 1, b1*p+1, b2*p+1, b3*p+1 ];
     O3 := CayleyOctadEighthPoint(O1, O2);
@@ -311,7 +313,7 @@ if Alpha2bv1Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^ABCD_2b";
-    vOc  := vpt({1,2,3,4}) + vpl({1,2,3,4});
+    vOc  := vPt({1,2,3,4}) + vPl({1,2,3,4});
     _Oc := CremonaImage(_O, [ 5,6,7,8, 4 ]);
 
     /* Check */
@@ -325,7 +327,7 @@ if Alpha2bv2Case then
 
     /* The octad */
     tpO := "Alpha^ABCD_2b";
-    vO  := vpt({1,2,3,4}) + vpl({1,2,3,4});
+    vO  := vPt({1,2,3,4}) + vPl({1,2,3,4});
     O1 := [ 1, a1*p+1, a2*p+1, a3*p+1 ];
     O2 := [ 1, b1*p+1, b2*p+1, b3*p+1 ];
     O3 := CayleyOctadEighthPoint(O1, O2);
@@ -342,7 +344,7 @@ if Alpha2bv2Case then
 
     /* It's Cremona image */
     tpOc := "Alpha^ABCD_2a";
-    vOc  := vpl({1,2,3,4}) +  vpl({5,6,7,8});
+    vOc  := vPl({1,2,3,4}) +  vPl({5,6,7,8});
     _Oc := CremonaImage(_O, [ 1,2,5,6, 4 ]);
 
     /* Check */
@@ -366,7 +368,7 @@ if Chi1av1Case then
 
     /* The octad */
     tpO := "Chi^AB|CDE|FGH_1a";
-    vO  := vmax( vln({3,4,5}) + vln({6,7,8}), vpl({3,4,5,6,7,8}) );
+    vO  := vmax( vLn({3,4,5}) + vLn({6,7,8}), vPl({3,4,5,6,7,8}) );
     O3 := [ 1, 1+p*a1, a2, a3 ];
     O4 := [ 1, 1+p*b1, b2, a3+p*b3];
     O8 := CayleyOctadEighthPoint(O3, O4);
@@ -383,7 +385,7 @@ if Chi1av1Case then
 
     /* It's Cremona image */
     tpOc := "Chi^AB|CDE|FGH_1a";
-    vOc  := vmax( vln({3,4,5}) + vln({6,7,8}), vpl({3,4,5,6,7,8}) );
+    vOc  := vmax( vLn({3,4,5}) + vLn({6,7,8}), vPl({3,4,5,6,7,8}) );
     _Oc := CremonaImage(_O, [ 1,2,3,8, 7]);
 
     /* Check */
@@ -397,7 +399,7 @@ if Chi1av2Case then
 
     /* The octad */
     tpO := "Chi^AB|CDE|FGH_1a";
-    vO  := vmax( vln({3,4,5}) + vln({6,7,8}), vpl({3,4,5,6,7,8}) );
+    vO  := vmax( vLn({3,4,5}) + vLn({6,7,8}), vPl({3,4,5,6,7,8}) );
     O3 := [ 1, 1+p*a1, a2, a3 ];
     O4 := [ 1, 1+p*b1, b2, a3+p*b3];
     O8 := CayleyOctadEighthPoint(O3, O4);
@@ -414,7 +416,7 @@ if Chi1av2Case then
 
     /* It's Cremona image */
     tpOc := "Chi^AB|CDE|FGH_1c";
-    vOc  := vmax( vln({1,2,6,7,8}) + vln({6,7,8}), vpt({6,7,8}) );
+    vOc  := vmax( vLn({1,2,6,7,8}) + vLn({6,7,8}), vPt({6,7,8}) );
     _Oc := CremonaImage(_O, [2,3,4,5, 6]);
 
     /* Check */
@@ -428,7 +430,7 @@ if Chi1av3Case then
 
     /* The octad */
     tpO := "Chi^AB|CDE|FGH_1a";
-    vO  := vmax( vln({3,4,5}) + vln({6,7,8}), vpl({3,4,5,6,7,8}) );
+    vO  := vmax( vLn({3,4,5}) + vLn({6,7,8}), vPl({3,4,5,6,7,8}) );
     O3 := [ 1, 1+p*a1, a2, a3 ];
     O4 := [ 1, 1+p*b1, b2, a3+p*b3];
     O8 := CayleyOctadEighthPoint(O3, O4);
@@ -445,7 +447,7 @@ if Chi1av3Case then
 
     /* It's Cremona image */
     tpOc := "Chi^EF|BCD|AGH_1b";
-    vOc  := vmax( vpt({5,6}), vpl({5,6,2,3,4})+ vpl({5,6,1,7,8}) );
+    vOc  := vmax( vPt({5,6}), vPl({5,6,2,3,4})+ vPl({5,6,1,7,8}) );
     _Oc := CremonaImage(_O, [ 1,3,4,6, 7]);
 
     /* Check */
@@ -465,7 +467,7 @@ if Chi2av1Case then
 
     /* The octad */
     tpO := "Chi^ABC_2a";
-    vO  := vln({4,5,6,7,8}) + vpl({4,5,6,7,8});
+    vO  := vLn({4,5,6,7,8}) + vPl({4,5,6,7,8});
     O6 := [ 1, 1+a1*p, 1+a2*p, a3 ];
     O7 := [ 1, 1+p*a1*b1, 1 + p*a2*b1 + p^2*b2, b3 ];
     O8 := CayleyOctadEighthPoint(O6, O7);
@@ -482,7 +484,7 @@ if Chi2av1Case then
 
     /* It's Cremona image */
     tpOc := "Chi^ABC_2a";
-    vOc  := vln({4,5,6,7,8}) + vpl({4,5,6,7,8});
+    vOc  := vLn({4,5,6,7,8}) + vPl({4,5,6,7,8});
     _Oc := CremonaImage(_O, [ 1,2,3,4, 5 ]);
 
     /* Check */
@@ -497,7 +499,7 @@ if Chi2av2Case then
 
     /* The octad */
     tpO := "Chi^ABC_2a";
-    vO  := vln({4,5,6,7,8}) + vpl({4,5,6,7,8});
+    vO  := vLn({4,5,6,7,8}) + vPl({4,5,6,7,8});
     O6 := [ 1, 1+a1*p, 1+a2*p, a3 ];
     O7 := [ 1, 1+p*b1, 1 + p*(a2*b1/a1) + p^2*b2, b3 ];
     O8 := CayleyOctadEighthPoint(O6, O7);
@@ -514,7 +516,7 @@ if Chi2av2Case then
 
     /* It's Cremona image */
     tpOc := "Chi^AB|CDE|FGH_1c";
-    vOc  := vmax( vln({1,2,6,7,8}) + vln({6,7,8}), vpt({6,7,8}) );
+    vOc  := vmax( vLn({1,2,6,7,8}) + vLn({6,7,8}), vPt({6,7,8}) );
     _Oc := CremonaImage(_O, [ 1,2,4,5, 3]);
 
     /* Check */
@@ -539,8 +541,8 @@ if Phi1av1Case then
     /* The octad */
     tpO := "Phi^AB|CD||EF|GH_1a";
     vO  :=
-        vln({3,4,5,6}) + vln({3,4,7,8}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8}) ;
+        vLn({3,4,5,6}) + vLn({3,4,7,8}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8}) ;
     O8 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ];
     O3 := [ 0+p*b1, 0+p*b2, 1, b3];
     O4 := CayleyOctadEighthPoint(O8, O3);
@@ -557,7 +559,7 @@ if Phi1av1Case then
 
     /* It's Cremona image */
     tpOc := "Phi^ABCD_3a";
-    vOc  := vln({1,2,3,4}) + vpl({1,2,3,4}) + vpl({5,6,7,8});
+    vOc  := vLn({1,2,3,4}) + vPl({1,2,3,4}) + vPl({5,6,7,8});
     _Oc := CremonaImage(_O, [ 1,2,5,6, 7 ]);
 
     /* Check */
@@ -572,8 +574,8 @@ if Phi1av2Case then
     /* The octad */
     tpO := "Phi^AB|CD||EF|GH_1a";
     vO  :=
-        vln({3,4,5,6}) + vln({3,4,7,8}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8}) ;
+        vLn({3,4,5,6}) + vLn({3,4,7,8}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8}) ;
     O8 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ];
     O3 := [ 0+p*b1, 0+p*b2, 1, b3];
     O4 := CayleyOctadEighthPoint(O8, O3);
@@ -591,8 +593,8 @@ if Phi1av2Case then
     /* It's Cremona image */
     tpOc := "Phi^AB|CD||EF|GH_1b";
     vOc  := vmax(
-        vpt({5, 6}) + vpt({7, 8}),
-        vpl({5, 6, 7, 8, 1, 2}) + vpl({5, 6, 7, 8, 3, 4})
+        vPt({5, 6}) + vPt({7, 8}),
+        vPl({5, 6, 7, 8, 1, 2}) + vPl({5, 6, 7, 8, 3, 4})
         );
     _Oc := CremonaImage(_O, [1,2,3,4, 7]);
 
@@ -608,8 +610,8 @@ if Phi1av3Case then
     /* The octad */
     tpO := "Phi^AB|CD||EF|GH_1a";
     vO  :=
-        vln({3,4,5,6}) + vln({3,4,7,8}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8}) ;
+        vLn({3,4,5,6}) + vLn({3,4,7,8}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8}) ;
     O8 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ];
     O3 := [ 0+p*b1, 0+p*b2, 1, b3];
     O4 := CayleyOctadEighthPoint(O8, O3);
@@ -627,8 +629,8 @@ if Phi1av3Case then
     /* It's Cremona image */
     tpOc := "Phi^AB|CD||EF|GH_1a";
     vOc  :=
-        vln({3,4,5,6}) + vln({3,4,7,8}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8}) ;
+        vLn({3,4,5,6}) + vLn({3,4,7,8}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8}) ;
     _Oc := CremonaImage(_O, [1,2,5,8, 7]);
 
     /* Check */
@@ -643,8 +645,8 @@ if Phi1av4Case then
     /* The octad */
     tpO := "Phi^AB|CD||EF|GH_1a";
     vO  :=
-        vln({3,4,5,6}) + vln({3,4,7,8}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8}) ;
+        vLn({3,4,5,6}) + vLn({3,4,7,8}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8}) ;
     O8 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ];
     O3 := [ 0+p*b1, 0+p*b2, 1, b3];
     O4 := CayleyOctadEighthPoint(O8, O3);
@@ -662,8 +664,8 @@ if Phi1av4Case then
     /* It's Cremona image */
     tpOc := "Phi^AD|BC||EH|FG_1a";
     vOc  :=
-        vln({1,4,5,8}) + vln({1,4,6,7}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8});
+        vLn({1,4,5,8}) + vLn({1,4,6,7}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8});
     _Oc := CremonaImage(_O, [ 1,3,5,7, 2]);
 
     /* Check */
@@ -678,8 +680,8 @@ if Phi1av5Case then
     /* The octad */
     tpO := "Phi^AB|CD||EF|GH_1a";
     vO  :=
-        vln({3,4,5,6}) + vln({3,4,7,8}) +
-        vpl({1,2,3,4}) + vpl({5,6,7,8}) ;
+        vLn({3,4,5,6}) + vLn({3,4,7,8}) +
+        vPl({1,2,3,4}) + vPl({5,6,7,8}) ;
     O8 := [ 1, 1+a1*p, a2, a2*b3-b3+1+p*a3 ];
     O3 := [ 0+p*b1, 0+p*b2, 1, b3];
     O4 := CayleyOctadEighthPoint(O8, O3);
@@ -697,8 +699,8 @@ if Phi1av5Case then
     /* It's Cremona image */
     tpOc := "Phi^ABF||CGH_2a";
     vOc  := vmax(
-        vln({ 3, 7, 8 })       + vln({ 1, 2, 6}),
-        vpl({ 3, 7, 8, 4, 5 }) + vpl({ 1, 2, 6, 4, 5 })
+        vLn({ 3, 7, 8 })       + vLn({ 1, 2, 6}),
+        vPl({ 3, 7, 8, 4, 5 }) + vPl({ 1, 2, 6, 4, 5 })
         );
     _Oc := CremonaImage(_O, [ 1,2,3,5, 7]);
 
@@ -721,8 +723,8 @@ if Phi2av1Case then
     /* The octad */
     tpO := "Phi^CDE|FGH_2a";
     vO  := vmax(
-        vln({ 3, 4, 5 })       + vln({ 6, 7, 8}),
-        vpl({ 1, 2, 3, 4, 5 }) + vpl({ 1, 2, 6, 7, 8 })
+        vLn({ 3, 4, 5 })       + vLn({ 6, 7, 8}),
+        vPl({ 1, 2, 3, 4, 5 }) + vPl({ 1, 2, 6, 7, 8 })
         );
     O5 := [ 0+p*a1, 1, a2*p, a3 ];
     O8 := [ 1, 1+p*b1, b2, 1+p*b3];
@@ -740,7 +742,7 @@ if Phi2av1Case then
 
     /* It's Cremona image */
     tpOc := "Phi^AFGH_3a";
-    vOc  := vln({1,6,7,8}) + vpl({1,6,7,8}) + vpl({2,3,4,5});
+    vOc  := vLn({1,6,7,8}) + vPl({1,6,7,8}) + vPl({2,3,4,5});
     _Oc := CremonaImage(_O, [1,3,4,5, 7]);
 
     /* Check */
@@ -755,8 +757,8 @@ if Phi2av2Case then
     /* The octad */
     tpO := "Phi^CDE|FGH_2a";
     vO  := vmax(
-        vln({ 3, 4, 5 })       + vln({ 6, 7, 8}),
-        vpl({ 1, 2, 3, 4, 5 }) + vpl({ 1, 2, 6, 7, 8 })
+        vLn({ 3, 4, 5 })       + vLn({ 6, 7, 8}),
+        vPl({ 1, 2, 3, 4, 5 }) + vPl({ 1, 2, 6, 7, 8 })
         );
     O5 := [ 0+p*a1, 1, a2*p, a3 ];
     O8 := [ 1, 1+p*b1, b2, 1+p*b3];
@@ -774,7 +776,7 @@ if Phi2av2Case then
 
     /* It's Cremona image */
     tpOc := "Phi^CDE|FGH_2c";
-    vOc  := vln({ 6,7,8, 1}) + vln({ 6,7,8, 2 }) + vpl({ 3, 4, 5, 6, 7, 8 });
+    vOc  := vLn({ 6,7,8, 1}) + vLn({ 6,7,8, 2 }) + vPl({ 3, 4, 5, 6, 7, 8 });
     _Oc := CremonaImage(_O, [1,2,3,4, 7]);
 
     /* Check */
@@ -789,8 +791,8 @@ if Phi2av3Case then
     /* The octad */
     tpO := "Phi^CDE|FGH_2a";
     vO  := vmax(
-        vln({ 3, 4, 5 })       + vln({ 6, 7, 8}),
-        vpl({ 1, 2, 3, 4, 5 }) + vpl({ 1, 2, 6, 7, 8 })
+        vLn({ 3, 4, 5 })       + vLn({ 6, 7, 8}),
+        vPl({ 1, 2, 3, 4, 5 }) + vPl({ 1, 2, 6, 7, 8 })
         );
     O5 := [ 0+p*a1, 1, a2*p, a3 ];
     O8 := [ 1, 1+p*b1, b2, 1+p*b3];
@@ -808,7 +810,7 @@ if Phi2av3Case then
 
     /* It's Cremona image */
     tpOc := "Phi^DEG|CFH_2c";
-    vOc  := vln({ 3,6,8, 1}) + vln({ 3,6,8, 2 }) + vpl({ 3, 4, 5, 6, 7, 8 });
+    vOc  := vLn({ 3,6,8, 1}) + vLn({ 3,6,8, 2 }) + vPl({ 3, 4, 5, 6, 7, 8 });
     _Oc := CremonaImage(_O, [1,2,3,7, 4]);
 
     /* Check */
@@ -828,7 +830,7 @@ if Phi3av1Case then
 
     /* The octad */
     tpO := "Phi^ABCD_3a";
-    vO  := ( vln({1, 2, 3, 4}) + vpl({1, 2, 3, 4}) + vpl({5, 6, 7, 8}) );
+    vO  := ( vLn({1, 2, 3, 4}) + vPl({1, 2, 3, 4}) + vPl({5, 6, 7, 8}) );
     O8 := [ a3, a3+p*a1, a2, 1 ];
     O3 := [ b3, b1, p*b2*a2*(a3-1), p*b2*(a3-a2) ];
     O4 := CayleyOctadEighthPoint(O8, O3);
@@ -845,7 +847,7 @@ if Phi3av1Case then
 
     /* It's Cremona image */
     tpOc := "Phi^ABCD_3b";
-    vOc  := vpt({5, 6, 7, 8}) + vln({5, 6, 7, 8}) + vpl({5, 6, 7, 8});
+    vOc  := vPt({5, 6, 7, 8}) + vLn({5, 6, 7, 8}) + vPl({5, 6, 7, 8});
     _Oc := CremonaImage(_O, [ 1,2,3,4, 7]);
 
     /* Check */

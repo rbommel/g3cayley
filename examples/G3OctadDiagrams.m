@@ -1,3 +1,8 @@
+/*
+   This script assumes that the spec file "g3cayley/magma/spec" is loaded
+   at magma startup (in the .magmarc file)
+ */
+
 SetVerbose("G3Cayley", 2);
 
 /* Stable reduction labels */

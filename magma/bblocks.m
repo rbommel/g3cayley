@@ -325,7 +325,7 @@ function AssociatedBlock(V : SetsInsteadOfPairs := false)
     d := Dimension(V);
     p := #(Set(V) meet E3_pairs);
     dp := [d, p];
-    
+
     case dp:
         when [1,1]:
             v := [w @@ rho : w in V | w ne 0][1];
@@ -413,14 +413,14 @@ function AssociatedSubspace(T)
         return sub< E3 | [rho(&+[V8.i : i in S]) : S in Subsets(q1, 2)] >;
     elif T[1] eq "Ln" then
         q1 := [ q : q in T[2] | not(1 in q) ][1];
-        S := &join[ { s : s in Subsets({2..8}, card) | #(s meet q1) mod 2 eq 0 } : card in [2,6] ] join { s : s in Subsets({2..8}, 4) | #(s meet q1) mod 2 eq 1 };    
+        S := &join[ { s : s in Subsets({2..8}, card) | #(s meet q1) mod 2 eq 0 } : card in [2,6] ] join { s : s in Subsets({2..8}, 4) | #(s meet q1) mod 2 eq 1 };
         return {E3|0} join { rho(&+[V8.i : i in s]) : s in S };
     elif T[1] eq "TCu" then
-        return E3_pairs;    
+        return E3_pairs;
     else
         assert(false);
     end if;
-     
+
 end function;
 
 function Act(M, V)
@@ -501,7 +501,7 @@ function GreaterThan(a,b)
         return 0;
     end if;
     return 1;
-    
+
 end function;
 
 function String(D)
@@ -691,7 +691,7 @@ function IsCompatible(T1, T2)
         else
             return IsCompatible(T2, T1);
         end if;
-        
+
     elif T1[1] eq "TCu" then
         if T2[1] eq "TCu" then
             return false;
@@ -734,7 +734,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
     /* Smooth curves */
     if w eq 0 then
         MyBenchStop(1, "Cayley Building Blocks", TT);
-        return [**];
+        return [**], Blocks;
     end if; // Catch smooth curves
 
     tt := MyBenchStart(2, "compatible Building Blocks");
@@ -797,8 +797,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
     assert #Sols eq 1;
     MyBenchStop(2, "A linear filtering", tt);
 
-    MyBenchStop(1, "Cayley Building Blocks", TT);
-
+    tt := MyBenchStart(2, "degenerancy filtering");
     D := [* Things[k] : k in PotentialSubsets[Sols[1]] *];
     if "C" in {d[1][1] : d in D} then
         // Remove degenerate block if necessary
@@ -807,5 +806,10 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
         I := [ i : i in [1..#D] | not(D[i][1] in {"Pl", "Tw"}) or (AssociatedSubspace(D[i]) ne VVperp) ];
         D := D[I];
     end if;
-    return D;
+    MyBenchStop(2, "Degenerancy filtering", tt);
+
+    MyBenchStop(1, "Cayley Building Blocks", TT);
+
+    return D, Blocks;
+
 end intrinsic;
