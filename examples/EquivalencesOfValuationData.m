@@ -162,8 +162,12 @@ for t := 1 to #[ Tw,  Pl,  TA, TB,  CA, CB, CC ] do
 
     end for;
 
-    "Dimensions are", KerDims;
-    "TCu valuations are", EqVals;
+    if #EqVals eq 0 then
+        "\t_ Non-compatible valuation data!";
+    else
+        "\t_ Dimensions are", KerDims;
+        "\t_ TCu valuations are", EqVals;
+    end if;
     "... done"; "";
 
 end for;
