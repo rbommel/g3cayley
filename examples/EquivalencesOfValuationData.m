@@ -14,10 +14,10 @@
 
 /* Useful definitions
  ***/
-V70 := VectorSpace(Rationals(), 70);
-
 _, KeySets        := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
-_, BuildingBlocks := CayleyOctadDiagram(V70!0);
+
+_, BuildingBlocks := CayleyOctadDiagram(
+    Vector([Rationals()|0 : i in [1..#KeySets]]));
 
 Tw,  Pl,  TA, TB,  CA, CB, CC,  Ln := Explode(BuildingBlocks);
 
