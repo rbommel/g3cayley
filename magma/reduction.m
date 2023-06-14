@@ -24,7 +24,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     LPrate := 10,
     randomize := true,
     AnalysisLevel := 0,
-    subspace := true) -> MonStgElt, SetMulti
+    subspace := true, thetaconstants := false) -> MonStgElt, SetMulti
 
     {Stable reduction type of a quartic via a Cayley octad approach}
 
@@ -85,7 +85,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     end for;
     CreIndexes := Sort([ Sort(Setseq(E)) : E in CreIndexes ]);
 
-    BBType := {* *};
+    BBType := {* *}; IsHyper := "Unknown";
 
     Prec := PrecMin; onerr := false; TT := Cputime();
     while Prec le PrecMax do
@@ -246,12 +246,6 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
 
                 odiag join:=  {* T[1] : T in ODiag *};
 
-                if AnalysisLevel lt 2 then
-                    bbtype join:= {* odiag^^56 *};
-                else
-                    bbtype join:= {* odiag *};
-                end if;
-
                 if subspace then
                     /* Test to see if subspace diagrams give the right answer. */
                     tt0 := MyBenchStart(1, "Subspace diagrams");
@@ -261,23 +255,58 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                     SubspaceType := NewSubspaceType;
                     vprintf G3Cayley, 1: "%oThe type based on subspace graphs is: %o\n", MyBenchIndent(""), SubspaceType;
 
-                    vprintf G3Cayley, 1: "%o=> Type %o\n%o\n", MyBenchIndent(""), odiag, ODiag;
+                    vprintf G3Cayley, 1: "%o=> Type %o\n", MyBenchIndent(""), odiag;
                     MyBenchStop(1, "subspace diagrams", tt0);
                 end if;
 
-                /* Even thetaconstant valuations */
-                tt0 := MyBenchStart(1, "Thetaconstants");
-                ThetaConstants := [ G3ThetaFromOctad(i, PGLPlOrb[k]) : i in [1..64] | G3ThetaCharParity(i) ];
-                ThetaVal := [ Valuation(t) : t in ThetaConstants ];
-                vl := -Infinity(); ThetaValuations := {**}; Nvl := 0;
-                while Nvl lt #ThetaVal do
-                    vl  := Min([ v : v in ThetaVal | v gt vl] );
-                    nvl := #[ v : v in ThetaVal | v eq vl];
-                    ThetaValuations join:= {* vl^^nvl *};
-                    Nvl +:= nvl;
-                end while;
-                vprintf G3Cayley, 1: "%o=> Valuations are %o\n", MyBenchIndent(""), ThetaValuations;
-                MyBenchStop(1, "thetaconstants", tt0);
+                if thetaconstants then
+                    /* Even thetaconstant valuations */
+                    tt0 := MyBenchStart(1, "Thetaconstants");
+                    ThetaConstants := [ G3ThetaFromOctad(i, PGLPlOrb[k]) : i in [1..64] | G3ThetaCharParity(i) ];
+                    ThetaVal := [ Valuation(t) : t in ThetaConstants ];
+                    vprintf G3Cayley, 1: "%o=> Valuations are %o\n", MyBenchIndent(""), {* e - Min(ThetaVal) : e in ThetaVal *};
+                    MyBenchStop(1, "thetaconstants", tt0);
+                end if;
+
+                /* Is hyperelliptic or not ? (if not already known) */
+                if IsHyper eq "Unknown" then
+                    if "Ln" in odiag then IsHyper := "Yes"; end if;
+                end if;
+
+                if IsHyper eq "Unknown" then
+                    Fpl := PolynomialRing( Rationals(), [ 1 : i in [1..70+1] ] ); pi := Fpl.71;
+
+                    Pl := [ Fpl.i * pi^(Integers()!VlOctad[i]) : i in [1..70] ];
+                    Tw := CayleyOctadTwistedCubicRelations(Pl);
+
+                    TermDegrees :=  [ [Degree(T, pi) : T in Terms(E) ] : E in Tw ];
+                    if { L[1] eq L[2] : L in TermDegrees } ne {true} then IsHyper := "No"; end if;
+                end if;
+
+                if IsHyper eq "Unknown" then
+                    TV := Vector([ Degree(e, pi) : e in Tw ]);
+
+                    TwO := CayleyOctadTwistedCubicRelations(PGLPlOrb[k]);
+                    TVO := Vector([ Rationals() | Valuation(e) : e in TwO]);
+                    vprintf G3Cayley, 1: "%o=> Twisted equation valuations are %o\n",
+                        MyBenchIndent(""), TVO;
+
+                    DTV := TVO - TV;
+
+                    if Min(Eltseq(DTV)) gt 0 then IsHyper := "Yes"; end if;
+
+                end if;
+
+                vprintf G3Cayley, 1: "%o=> Hyperelliptic reduction: %o\n", MyBenchIndent(""), IsHyper;
+
+                if IsHyper eq "Yes" and not "Ln" in odiag then odiag; odiag join:= {* "TCu" *}; end if;
+
+                if AnalysisLevel lt 2 then
+                    bbtype join:= {* odiag^^56 *};
+                else
+                    bbtype join:= {* odiag *};
+                end if;
+
 
 
             end for;

@@ -710,7 +710,7 @@ end function;
 // The data store for building blocks. Do not access directly!
 G3CayleyBBlocks := NewStore();
 
-intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
+intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any
     {Compute an octad diagram}
 
     TT := MyBenchStart(1, "Cayley Building Blocks");
@@ -795,9 +795,14 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
     end for;
     vprintf G3Cayley, 2:  "%o=> %o solutions;\n", MyBenchIndent(""), #Sols;
     assert #Sols eq 1;
+    vprintf G3Cayley, 2:
+        "%o=> Decomposition is %o", MyBenchIndent(""),
+        [* Things[k] : k in PotentialSubsets[Sols[1]] *];
+    vprintf G3Cayley, 2:
+        " with linear combination vector %o;\n", crd;
     MyBenchStop(2, "A linear filtering", tt);
 
-    tt := MyBenchStart(2, "degenerancy filtering");
+    tt := MyBenchStart(2, "Candy degenerancy filtering");
     D := [* Things[k] : k in PotentialSubsets[Sols[1]] *];
     if "C" in {d[1][1] : d in D} then
         // Remove degenerate block if necessary
@@ -806,7 +811,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
         I := [ i : i in [1..#D] | not(D[i][1] in {"Pl", "Tw"}) or (AssociatedSubspace(D[i]) ne VVperp) ];
         D := D[I];
     end if;
-    MyBenchStop(2, "Degenerancy filtering", tt);
+    MyBenchStop(2, "Candy degenerancy filtering", tt);
 
     MyBenchStop(1, "Cayley Building Blocks", TT);
 

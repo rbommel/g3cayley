@@ -42,7 +42,7 @@ intrinsic CayleyOctadRelations(Plck::SeqEnum) -> SeqEnum
         P[key] := Plck[idx];
     end for;
 
-    /* The 420 relations */
+    /* The 1260 relations */
     SYS := [
         P[1367]*P[3478]*P[1258]*P[2456] - P[1378]*P[2458]*P[3467]*P[1256],
         P[2578]*P[1467]*P[3468]*P[1235] - P[4678]*P[2358]*P[1346]*P[1257],
@@ -1322,7 +1322,7 @@ intrinsic CayleyOctadTwistedCubicRelations(Plck::SeqEnum) -> SeqEnum
         P[key] := Plck[idx];
     end for;
 
-    /* The 420 relations */
+    /* The 840 relations */
     SYS := [
         P[2467]*P[1478]*P[1456]*P[2458] - P[1467]*P[2478]*P[2456]*P[1458],
         P[2347]*P[4578]*P[1357]*P[1278] - P[3457]*P[2478]*P[1237]*P[1578],
