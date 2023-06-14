@@ -299,7 +299,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
 
                 vprintf G3Cayley, 1: "%o=> Hyperelliptic reduction: %o\n", MyBenchIndent(""), IsHyper;
 
-                if IsHyper eq "Yes" and not "Ln" in odiag then odiag; odiag join:= {* "TCu" *}; end if;
+                if IsHyper eq "Yes" and not "Ln" in odiag then odiag join:= {* "TCu" *}; end if;
 
                 if AnalysisLevel lt 2 then
                     bbtype join:= {* odiag^^56 *};
