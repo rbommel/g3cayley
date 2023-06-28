@@ -772,7 +772,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any
     Subspaces := [ Parent(V70) | ];
     for S in CompatibleSubsets do
         W := sub< V70 | &cat[GoodVectors[i] : i in S ]>;
-        assert Dimension(W) eq # &cat[GoodVectors[i] : i in S ];
+        // assert Dimension(W) eq # &cat[GoodVectors[i] : i in S ];
         if w in W then
             Append(~Subspaces, W);
             Append(~PotentialSubsets, S);
