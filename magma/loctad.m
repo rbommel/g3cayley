@@ -774,7 +774,7 @@ intrinsic CayleyOctadCremonaOrbit(Octad::SeqEnum) -> SeqEnum
             _O[i, 3] := 1 / _O[i, 3];
             _O[i, 4] := 1 / _O[i, 4];
         end for;
-        Append(~CremonaOrbit, _O);
+        Append(~CremonaOrbit, NormaliseOctad(_O));
     end for;
 
     return CremonaOrbit;
