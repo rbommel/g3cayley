@@ -48,6 +48,9 @@ intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
 intrinsic PluckerValuations(PlOctad::SeqEnum) -> ModTupFldElt
 { On input of a plucker sequence, this function returns its 70-dimensional valuation vector }
 
+intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5})->ModTupFldElt
+{ Compute the valuation data of the normalised octad. The optional parameter S determines which points of the octad will be at the standard position (default: 1,2,3,4,5). }
+
 intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
 {Compute an octad diagram}
 

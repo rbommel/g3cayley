@@ -91,7 +91,7 @@ function CayleyBuildingBlocks()
     W := sub<V70 | [ V70!x : x in B ]>;
     MyBenchStop(2, "Defaults", tt);
 
-    // Twins
+    // Twins or alpha1 blocks
     tt := MyBenchStart(2, "Twins");
     Tw := AssociativeArray();
     for s in Subsets({1..8}, 2) do
@@ -105,7 +105,7 @@ function CayleyBuildingBlocks()
     vprintf G3Cayley, 2:  "%o=> %o twin blocks;\n", MyBenchIndent(""), #Keys(Tw);
     MyBenchStop(2, "Twins", tt);
 
-    // Planes
+    // Planes or alpha2 blocks
     tt := MyBenchStart(2, "Planes");
     S4 := { {T, {i : i in {1..8} | not(i in T)}} : T in KeySets };
     Pl := AssociativeArray();
@@ -127,7 +127,7 @@ function CayleyBuildingBlocks()
     vprintf G3Cayley, 2:  "%o=> %o plane blocks;\n", MyBenchIndent(""), #Keys(Pl);
     MyBenchStop(2, "Planes", tt);
 
-    // Type A
+    // Type A or chi1 blocks
     tt := MyBenchStart(2, "Type A");
     ST := { < T, {V, {i : i in {1..8} | not(i in T join V)}} > : T in Subsets({1..8}, 2), V in Subsets({1..8}, 3) | #(T meet V) eq 0 };
     TA := AssociativeArray();
@@ -158,7 +158,7 @@ function CayleyBuildingBlocks()
     vprintf G3Cayley, 2:  "%o=> %o Type A blocks;\n", MyBenchIndent(""), #Keys(TA);
     MyBenchStop(2, "Type A", tt);
 
-    // Type B
+    // Type B or chi2 blocks
     tt := MyBenchStart(2, "Type B");
     TB := AssociativeArray();
     for s in Subsets({1..8}, 3) do
@@ -180,7 +180,7 @@ function CayleyBuildingBlocks()
     vprintf G3Cayley, 2:  "%o=> %o Type B blocks;\n", MyBenchIndent(""), #Keys(TB);
     MyBenchStop(2, "Type B", tt);
 
-    // Candy A
+    // Candy A or phi1 blocks
     tt := MyBenchStart(2, "Candy A");
     S2222 := {};
     CA := AssociativeArray();
@@ -217,7 +217,7 @@ function CayleyBuildingBlocks()
     vprintf G3Cayley, 2:  "%o=> %o Candy A blocks;\n", MyBenchIndent(""), #Keys(CA);
     MyBenchStop(2, "Candy A", tt);
 
-    // Candy B
+    // Candy B or phi2 blocks
     tt := MyBenchStart(2, "Candy B");
     CB := AssociativeArray();
     for s in ST do
@@ -250,7 +250,7 @@ function CayleyBuildingBlocks()
     vprintf G3Cayley, 2:  "%o=> %o Candy B blocks;\n", MyBenchIndent(""), #Keys(CB);
     MyBenchStop(2, "Candy B", tt);
 
-    // Candy C
+    // Candy C or phi3 blocks
     tt := MyBenchStart(2, "Candy C");
     CC := AssociativeArray();
     for s in S4 do

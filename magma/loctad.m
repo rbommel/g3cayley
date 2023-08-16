@@ -11,9 +11,12 @@
  *
  * intrinsic CayleyOctadCremonaOrbit(O::SeqEnum) -> SeqEnum
  *
+ * intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5}) -> ModTupFldElt
+ *
  ********************************************************************/
 
 import "verbose.m" : MyBenchIndent, MyBenchStart, MyBenchStop;
+import "bblocks.m" : KeySets, V70;
 
 /* Ad-hoc field completion */
 function pAdicBaseRing(Rg)
@@ -752,6 +755,23 @@ intrinsic CayleyOctadPGLOrbit(O::SeqEnum) -> SeqEnum
 
     return PGLOrbit;
 
+end intrinsic;
+
+intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5})->ModTupFldElt
+{ Compute the valuation data of the normalised octad. The optional parameter S determines which points of the octad will be at the standard position (default: 1,2,3,4,5). }
+	assert(#S eq 5);
+	W8 := [ &+[V70.j : j in [1..70] | i in KeySets[j]] : i in [1..8] ];
+	SKeys := [i : i in [1..70] | KeySets[i] subset S];
+	B1 := [v1] cat W8;
+	M1 := [ [v[i] : i in SKeys] : v in B1 ];
+	K1 := Basis(Kernel(Matrix(M1)));
+	assert [ <i, b[1] eq 1> : i->b in K1 ] eq [<1,true>,<2,false>,<3,false>,<4,false>];
+	B2 := [ &+[w[i]*v : i->v in B1 ] : w in K1 ];
+	M2 := [ [Min([v[i] : i in [1..70] | #(KeySets[i] meet S) eq 3 and j in KeySets[i]]) : j in {1..8} diff S] : v in B2 ];
+	K2 := Basis(Kernel(Matrix(M2)));
+	assert #K2 eq 1;
+	v3 := &+[ K2[1][i]*v : i->v in B2 ];
+	return v3;
 end intrinsic;
 
 intrinsic CayleyOctadCremonaOrbit(Octad::SeqEnum) -> SeqEnum
