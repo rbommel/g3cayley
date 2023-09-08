@@ -710,7 +710,7 @@ end function;
 // The data store for building blocks. Do not access directly!
 G3CayleyBBlocks := NewStore();
 
-intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any
+intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
     {Compute an octad diagram}
 
     TT := MyBenchStart(1, "Cayley Building Blocks");
@@ -734,7 +734,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any
     /* Smooth curves */
     if w eq 0 then
         MyBenchStop(1, "Cayley Building Blocks", TT);
-        return [**], Blocks;
+        return [**], Blocks, IsCompatible;
     end if; // Catch smooth curves
 
     tt := MyBenchStart(2, "compatible Building Blocks");
@@ -815,6 +815,6 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any
 
     MyBenchStop(1, "Cayley Building Blocks", TT);
 
-    return D, Blocks;
+    return D, Blocks, IsCompatible;
 
 end intrinsic;

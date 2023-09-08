@@ -1,11 +1,33 @@
-// This file describes a proof of the unicity of the block decomposition (if it exists).
-// First we do some preloading.
-AttachSpec("magma/spec");
-import "magma/bblocks.m" : CayleyBuildingBlocks, IsCompatible, KeySets, V70;
-Things, B := CayleyBuildingBlocks();
-Tw, Pl, TA, TB, CA, CB, CC, Ln := Explode(B);
+/*
+   Computational proof of a statement in [Bom+23] R. van Bommel, J. Docking, V. Dokchitser, R. Lercier and E. Lorenzo García, Reduction of plane quartics and Cayley octads, arXiv:xxx.
+
+   This file describes a proof of the unicity of the block decomposition (if it exists).
+
+   This script assumes that the spec file "g3cayley/magma/spec" is loaded
+   at magma startup (in the .magmarc file).
+*/
+
+// Building Block Precomputations
+_, KeySets        := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
+
+_, BuildingBlocks, IsBBCompatible := CayleyOctadDiagram(
+    Vector([Rationals()|0 : i in [1..#KeySets]]));
+
+Tw,  Pl,  TA, TB,  CA, CB, CC,  Ln := Explode(BuildingBlocks);
+
+Things := [* *];
+for key in Keys(Tw) do Append(~Things, <"Tw", key>); end for;
+for key in Keys(Pl) do Append(~Things, <"Pl", key>); end for;
+for key in Keys(TA) do Append(~Things, <"TA", key>); end for;
+for key in Keys(TB) do Append(~Things, <"TB", key>); end for;
+for key in Keys(CA) do Append(~Things, <"CA", key>); end for;
+for key in Keys(CB) do Append(~Things, <"CB", key>); end for;
+for key in Keys(CC) do Append(~Things, <"CC", key>); end for;
+for key in Keys(Ln) do Append(~Things, <"Ln", key>); end for;
+
 V := [* < t, (eval t[1])[t[2]] > : t in Things *];
-CompatibilityMatrix := [ [ IsCompatible(Things[i], Things[j]) : i in [1..#Things] ] : j in [1..#Things] ];
+
+CompatibilityMatrix := [ [ IsBBCompatible(Things[i], Things[j]) : i in [1..#Things] ] : j in [1..#Things] ];
 
 // Computing all 2626648 compatible sets of building blocks.
 Queue := { <{Integers()| }, {1..#Things}> };
@@ -32,7 +54,7 @@ function ApplyPermutation(T, sigma)
 	elif Type(T) eq List then
 		return [* ApplyPermutation(t, sigma) : t in T *];
 	end if;
-	assert false;		
+	assert false;
 end function;
 
 LookupTable := AssociativeArray();

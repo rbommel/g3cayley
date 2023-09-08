@@ -16,7 +16,6 @@ import "stabletypes.m" : AllTypes, OctadDiagrams, SubspaceGraphs;
 import "loctad.m" : NormaliseOctad;
 import "bblocks.m" : AssociatedSubspace, SubspaceGraph, String;
 
-
 intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
     PrecMin := 100,
     PrecMax := 2^8*100,
@@ -273,7 +272,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                     if "Ln" in odiag then IsHyper := "Yes"; end if;
                 end if;
 
-                if IsHyper eq "Unknown" then
+                if true /* IsHyper eq "Unknown" */ then
                     Fpl := PolynomialRing( Rationals(), [ 1 : i in [1..70+1] ] ); pi := Fpl.71;
 
                     Pl := [ Fpl.i * pi^(Integers()!VlOctad[i]) : i in [1..70] ];
@@ -283,13 +282,15 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                     if { L[1] eq L[2] : L in TermDegrees } ne {true} then IsHyper := "No"; end if;
                 end if;
 
-                if IsHyper eq "Unknown" then
+                if true /* IsHyper eq "Unknown" */ then
                     TV := Vector([ Degree(e, pi) : e in Tw ]);
+                    vprintf G3Cayley, 1: "%o=> (Default) Twisted equation valuations are %o (homogeneous: %o)\n",
+                        MyBenchIndent(""), {* e : e in Eltseq(TV) *}, { L[1] eq L[2] : L in TermDegrees };
 
                     TwO := CayleyOctadTwistedCubicRelations(PGLPlOrb[k]);
                     TVO := Vector([ Rationals() | Valuation(e) : e in TwO]);
-                    vprintf G3Cayley, 1: "%o=> Twisted equation valuations are %o\n",
-                        MyBenchIndent(""), TVO;
+                    vprintf G3Cayley, 1: "%o=> (Real) Twisted equation valuations are %o (diff = %o)\n",
+                        MyBenchIndent(""), {* e : e in Eltseq(TVO) *}, {* e : e in Eltseq(TVO-TV) *};
 
                     DTV := TVO - TV;
 
