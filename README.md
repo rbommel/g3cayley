@@ -56,5 +56,5 @@ Citing this code
 Please cite the following preprint if this code has been helpful in your research:
 
 [Bom+23] Raymond van Bommel, Jordan Docking, Vladimir Dokchitser, Reynald Lercier and Elisa Lorenzo García,
-*Reduction of plane quartics and Cayley octads*,
-[arXiv:xxx](https://arxiv.org/abs/xxx).
+*Reduction of Plane Quartics and Cayley Octads*,
+[arXiv:2309.17381](https://arxiv.org/abs/2309.17381).
