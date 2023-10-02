@@ -102,6 +102,7 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
         catch e
             Prec *:= 2; onerr := true;
             SetVerbose("G3CayleyIndents", indent);
+            vprintf G3Cayley, 2: "%o\n", e;
             vprintf G3Cayley, 1:
                 "\n%o!!! An error catched in pAdicCayleyOctad(), let us restart at precision %o...\n",
                 MyBenchIndent(""), Prec;

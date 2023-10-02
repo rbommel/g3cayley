@@ -394,20 +394,23 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
         RSF := ChangeRing(Rp, SF); xL := RSF.1; AssignNames(~RSF, ["xL"]);
 
         Bitp := []; // Bitangents are of the form y = a*x + b
-        BPts := []; // Inteserction points with the curve
+        BPts := []; // Intersection points with the curve
         prec := Precision(SF);
         for rb in rts do
 
             vprintf G3Cayley, 2: "%o=> b, at precision %o\n", MyBenchIndent(""), Precision(rb);
 
             EQs := [*
-                LPClean(UnivariatePolynomial(Evaluate(ChangeRing(E, SF), 2, rb))) : E in SYSp[1..2]
+                LPClean(UnivariatePolynomial(Evaluate(ChangeRing(E, SF), 2, rb))) : E in SYSp
                 *];
 
             if gbasis then
                 ra := Evaluate(polina, rb);
             else
-                polina := LPClean(pAdicGCD(1, EQs[1], EQs[2] : LPrate := LPrate));
+                polina := EQs[1];
+                for i in [2..#EQs] do
+                	polina := LPClean(pAdicGCD(1, polina, EQs[i] : LPrate := LPrate));
+                end for;
                 assert( Degree(polina) eq 1 );
 
                 ra := Roots(polina)[1,1];
@@ -549,7 +552,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
 
     tt := MyBenchStart(1, "The determinantial quartic equation");
     eqCLp2 := eqCL^2;
-    T := Matrix(4, 4, [pAdicDiv(aN[i,j], eqCLp2) : i,j in [1..4]]);
+    T := Matrix(4, 4, [pAdicDiv( LPClean(aN[i,j]) , eqCLp2) : i,j in [1..4]]);
 
     assert(not IsZero(T));
 
@@ -613,19 +616,19 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     if Degree(upol) gt 8 then
 
         tt0 := MyBenchStart(1, "the resultant u23");
-        time u23 := LPClean(UnivariatePolynomial(Resultant(w2, w3, bq)));
+        u23 := LPClean(UnivariatePolynomial(Resultant(w2, w3, bq)));
         vprint G3Cayley, 2:  LPPrint("=> u23", u23);
         MyBenchStop(1, "the resultant u23", tt0);
         vprint G3Cayley, 1: "";
 
         tt0 := MyBenchStart(1, "GCD with u23");
-        time upol := pAdicGCD(8, upol, u23 : LPrate := LPrate);
+        upol := pAdicGCD(8, upol, u23 : LPrate := LPrate);
         vprint G3Cayley, 2:  LPPrint("=>", upol);
         MyBenchStop(1, "GCD with u23", tt0);
         vprint G3Cayley, 1: "";
     end if;
 
-    assert(Degree(upol) eq 8);
+    assert(Degree(upol) ge 8);
 
     tt0 := MyBenchStart(1, "its splitting field");
     SU, rts_c := SplittingField(upol : Std := false);
@@ -679,7 +682,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
             u5 := UnivariatePolynomial(Evaluate(q2, [aq, b1, c1, One(SU)]));
 
             apol := Parent(u4)!0;
-            if u4 ne 0 and u5 ne 0 then
+            if false in {IsZero(c) : c in Coefficients(u4)} and false in {IsZero(c) : c in Coefficients(u5)} then
                 apol := pAdicGCD(1, u4, u5 : LPrate := LPrate);
                 assert(Degree(apol) ne 0);
             end if;
@@ -703,10 +706,8 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
                 Append(~cOctad, [a1, b1, c1, One(SU)]);
                 pr := Min([IsZero(e) select Infinity() else Precision(e) : e in [a1, b1, c1, One(SU)]]);
             end for;
-
-            MyBenchStop(1, str, tt1);
-
         end for;
+        MyBenchStop(1, str, tt1);
     end for;
     MyBenchStop(1, "rational solutions", tt0);
     vprint G3Cayley, 1: "";
