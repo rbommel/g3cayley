@@ -239,7 +239,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     Prec := 100,
     gbasis := false,
     LPrate := 10,
-    randomize := true) -> SeqEnum
+    randomize := true) -> SeqEnum, SeqEnum
 
     {Return a Cayley octad for the ternary quartic eqC defined
     in the completion field defined by the prime p}
@@ -719,7 +719,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     MyBenchStop(1, "a Cayley octad", TT);
     vprint G3Cayley, 1: "";
 
-    return cOctad;
+    return cOctad, [ ChangeRing(M, Universe(cOctad[1])) : M in [A, B, C ] ] ;
 end intrinsic;
 
 function pAdicValuation(x)
