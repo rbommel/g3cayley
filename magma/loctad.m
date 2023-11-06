@@ -239,6 +239,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     Prec := 100,
     gbasis := false,
     LPrate := 10,
+    AbsTotRamExt := false,
     randomize := true) -> SeqEnum, SeqEnum
 
     {Return a Cayley octad for the ternary quartic eqC defined
@@ -254,10 +255,11 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     vprint G3Cayley, 1: "";
 
     vprintf G3Cayley, 1:  "%oOptions are\n", MyBenchIndent("");
-    vprintf G3Cayley, 1:  "%o\t  Precision: %o\n", MyBenchIndent(""), Prec;
-    vprintf G3Cayley, 1:  "%o\t  Randomize: %o\n", MyBenchIndent(""), randomize;
-    vprintf G3Cayley, 1:  "%o\t     LPrate: %o\n", MyBenchIndent(""), LPrate;
-    vprintf G3Cayley, 1:  "%o\t   Groebner: %o\n", MyBenchIndent(""), gbasis;
+    vprintf G3Cayley, 1:  "%o\t   Precision: %o\n", MyBenchIndent(""), Prec;
+    vprintf G3Cayley, 1:  "%o\t   Randomize: %o\n", MyBenchIndent(""), randomize;
+    vprintf G3Cayley, 1:  "%o\t      LPrate: %o\n", MyBenchIndent(""), LPrate;
+    vprintf G3Cayley, 1:  "%o\tAbsTotRamExt: %o\n", MyBenchIndent(""), AbsTotRamExt;
+    vprintf G3Cayley, 1:  "%o\t    Groebner: %o\n", MyBenchIndent(""), gbasis;
     vprint G3Cayley, 1: "";
 
     // Randomizing the curve equation
@@ -361,13 +363,14 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
 
     MyBenchStop(1, "a bitangent polynomial", tt);
 
-
-    tt := MyBenchStart(1, "its factorization");
-    FP := Factorization(polinb);
-    Sort(~FP, func<f1,f2| Degree(f1[1])-Degree(f2[1])>);
-    // FP := [ <polinb, 1> ];
-    MyBenchStop(1, "its factorization", tt);
-    vprint G3Cayley, 1: "";
+    FP := [ <polinb, 1> ];
+    if not AbsTotRamExt then
+        tt := MyBenchStart(1, "its factorization");
+        FP := Factorization(polinb);
+        Sort(~FP, func<f1,f2| Degree(f1[1])-Degree(f2[1])>);
+        MyBenchStop(1, "its factorization", tt);
+        vprint G3Cayley, 1: "";
+    end if;
 
     fp := Rp!1;
     for _fp in FP do
@@ -381,7 +384,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
             continue;
         end if;
 
-        SF, rts := SplittingField(fp : Std := false);
+        SF, rts := SplittingField(fp : Std := AbsTotRamExt select true else false);
         vprintf G3Cayley, 2:
             "%o=> Extension of absolute degree %o: unramif. degree %o x ramif. degree %o\n",
             MyBenchIndent(""), AbsoluteDegree(SF), Degree(SF), RamificationDegree(SF);
@@ -631,7 +634,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     assert(Degree(upol) ge 8);
 
     tt0 := MyBenchStart(1, "its splitting field");
-    SU, rts_c := SplittingField(upol : Std := false);
+    SU, rts_c := SplittingField(upol : Std := AbsTotRamExt select true else false);
     if SF eq SU then
         vprintf G3Cayley, 2: "%o=> Everything splits\n", MyBenchIndent("");
     else
@@ -719,7 +722,7 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
     MyBenchStop(1, "a Cayley octad", TT);
     vprint G3Cayley, 1: "";
 
-    return cOctad, [ ChangeRing(M, Universe(cOctad[1])) : M in [A, B, C ] ] ;
+    return cOctad, [ A, B, C ] ;
 end intrinsic;
 
 function pAdicValuation(x)
