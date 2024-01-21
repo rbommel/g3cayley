@@ -1,5 +1,11 @@
-/* MAGMA calculations to check the validity of the singularity strata
- */
+/* In this file, we verify the claimed equivalence between quartic singularities
+   and Dixmier-Ohno relations
+
+   This script assumes that the spec file "g3cayley/magma/spec" is loaded
+   at magma startup (in the .magmarc file)
+*/
+
+
 forward A1NFBiSingular, A1p2NFBiSingular, A2NFBiSingular;
 
 /* The field */
