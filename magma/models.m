@@ -365,6 +365,16 @@ intrinsic QuarticByReductionType(Type::MonStgElt, p::RngIntElt :
                 a20*p^1*x^2*z^2 + a11*p^1*x*y*z^2 + a02*p^0*y^2*z^2 +
                 a30*p^0*x^3*z + a21*p^0*x^2*y*z + a12*p^1*x*y^2*z + a03*p^3*y^3*z +
                 a40*p^1*x^4 + a31*p^1*x^3*y + a22*p^1*x^2*y^2 + a13*p^3*x*y^3 + a04*p^5*y^4;
+
+/*
+            f :=
+                a00*(p^6)^1*z^4 +
+                a10*(p^4)^1*x*z^3 + a01*(p^3)^1*y*z^3 +
+                a20*(p^2)^1*x^2*z^2 + a11*(p^)^1*x*y*z^2 + a02*(p^6)^0*y^2*z^2 +
+                a30*(p^6)^0*x^3*z + a21*(p^6)^0*x^2*y*z + a12*(p^6)^1*x*y^2*z + a03*(p^6)^3*y^3*z +
+                a40*(p^6)^1*x^4 + a31*(p^6)^1*x^3*y + a22*(p^6)^1*x^2*y^2 + a13*(p^6)^3*x*y^3 + a04*(p^6)^5*y^4;
+*/
+
         end if;
     when "(1mm)" :
         if Flat then
@@ -383,6 +393,7 @@ intrinsic QuarticByReductionType(Type::MonStgElt, p::RngIntElt :
                 a30*p^(9)*x^3*z + a21*p^(3)*x^2*y*z + a12*p^(3)*x*y^2*z + a03*p^(9)*y^3*z +
                 a40*p^(2*6)*x^4 + a31*p^(1*6)*x^3*y + a22*p^(0*6)*x^2*y^2 + a13*p^(1*6)*x*y^3 +
                 a04*p^(2*6)*y^4;
+
         end if;
 
     when "(0nme)" :
@@ -477,6 +488,11 @@ intrinsic QuarticByReductionType(Type::MonStgElt, p::RngIntElt :
                 a20*p^(2)*x^2*z^2 + a11*p^(1)*x*y*z^2 + a02*p^(0*6)*y^2*z^2 +
                 a30*p^(0*6)*x^3*z + a21*p^(2)*x^2*y*z + a12*p^(7)*x*y^2*z + a03*p^(15)*y^3*z +
                 a40*p^(1*4)*x^4 + a31*p^(7)*x^3*y + a22*p^(2*7)*x^2*y^2 + a13*p^(22)*x*y^3 + a04*p^(30)*y^4;
+            /*
+            f := a00*p^18*z^4+a10*p^12*x*z^3+a01*p^9*y*z^3+a20*x^2*z^2*p^6+a11*x*y*z^2*p^3+a02*
+                 y^2*z^2+a30*x^3*z+a21*x^2*y*z+a12*p^3*x*y^2*z+a03*p^9*y^3*z+a40*x^4+a31*p*x^3*
+                 y+a22*p^6*x^2*y^2+a13*p^12*x*y^3+a04*p^18*y^4;
+            */
 
         end if;
 

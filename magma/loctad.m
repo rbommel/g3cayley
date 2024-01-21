@@ -286,9 +286,10 @@ intrinsic pAdicCayleyOctad(_eqC::RngMPolElt, p::RngIntElt  :
 
     /* p-adic completion, map in it the curve */
     tt := MyBenchStart(1, "a p-adic embedding of the curve");
-
     Qp := pAdicCompletion(K : p := p, Prec := Prec); tp := Qp.1; AssignNames(~Qp, ["tp"]);
     Rp := PolynomialRing(Qp); xp := Rp.1; AssignNames(~Rp, ["xp"]);
+
+
 
     phiRp := func<Pol | Rp![ pAdicConvert(e, CoefficientRing(Rp)) : e in Coefficients(Pol) ] >;
 

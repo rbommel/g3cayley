@@ -12,6 +12,14 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
   randomize := true,
   AnalysisLevel := 0) -> MonStgElt, SetMulti
 {Stable reduction type of a quartic via a Cayley octad approach}
+
+intrinsic QuarticTypeFromDO(DO::SeqEnum :
+  Prime := 0) -> SeqEnum
+{Given Dixmier-Ohno invariants, it returns the reduction type at prime if
+ they are defined over Q and Prime is non-zero. Otherwise, it returns two
+ lists of compatible singularity types of these Dixmier-Ohno invariants
+ (in Arnold classification).}
+
 ```
 
 ### Quartic/hyperelliptic models
@@ -31,6 +39,20 @@ intrinsic G3HyperReductionType(Type::MonStgElt, p::RngIntElt :
 intrinsic G3QuarticFromHyper(f::RngUPolElt, p::RngIntElt) -> RngMPolElt
 {}
 ```
+
+### Singular quartics
+
+```
+intrinsic HuiNormalForms(type::MonStgElt :
+    Domain := [-1000..1000], Monic := false) -> RngMPolElt
+{Returns a normal form for the given singularity type,
+ as listed p. 107 in Hui 1979 Phd thesis.}
+
+intrinsic  DixmierOhnoSingularityRelations(type::MonStgElt, DOinv::SeqEnum) -> SeqEnum
+{Given a singularity type, it evaluates its stratum relations at the
+ Dixmier-Ohno invariants in input.}
+```
+
 
 ### Octad toolbox
 

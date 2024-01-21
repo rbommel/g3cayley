@@ -6,4 +6,9 @@
   g3thetas.m
   models.m
   reduction.m
+
+  singularities
+  {
+    +singularities.spec
+  }
 }

@@ -53,8 +53,12 @@ where `n` is either `0`, `1` or `2`. A higher value gives more comments.
 Citing this code
 --
 
-Please cite the following preprint if this code has been helpful in your research:
+Please cite the following preprints if this code has been helpful in your research:
 
 [Bom+23] Raymond van Bommel, Jordan Docking, Vladimir Dokchitser, Reynald Lercier and Elisa Lorenzo García,
 *Reduction of Plane Quartics and Cayley Octads*,
 [arXiv:2309.17381](https://arxiv.org/abs/2309.17381).
+
+[Bom+24] Raymond van Bommel, Jordan Docking, Reynald Lercier and Elisa Lorenzo García,
+*Reduction of Plane Quartics and Dixmier-Ohno invariant*,
+[arXiv:2401.xxxxx](https://arxiv.org/abs/2401.xxxxx).
