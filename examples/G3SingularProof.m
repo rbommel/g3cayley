@@ -185,8 +185,8 @@ A1p2Stratum := func<DO | DixmierOhnoSingularityRelations("(A1^2)", DO)>;
 A1A2Stratum := func<DO | DixmierOhnoSingularityRelations("(A1A2)", DO)>;
 A1p3Stratum := func<DO | DixmierOhnoSingularityRelations("(A1^3)", DO)>;
 RedA1p3Stratum := func<DO | DixmierOhnoSingularityRelations("(rA1^3)", DO)>;
-RedA1p4_aStratum := func<DO | DixmierOhnoSingularityRelations("(rA1^4_a)", DO)>;
-RedA1p4_bStratum := func<DO | DixmierOhnoSingularityRelations("(rA1^4_b)", DO)>;
+RedA1p4cubStratum := func<DO | DixmierOhnoSingularityRelations("(rA1^4_cub)", DO)>;
+RedA1p4conStratum := func<DO | DixmierOhnoSingularityRelations("(rA1^4_con)", DO)>;
 A2p2Stratum := func<DO | DixmierOhnoSingularityRelations("(A2^2)", DO)>;
 A1p2A2Stratum := func<DO | DixmierOhnoSingularityRelations("(A1^2A2)", DO)>;
 A1A2p2Stratum := func<DO | DixmierOhnoSingularityRelations("(A1A2^2)", DO)>;
@@ -237,8 +237,8 @@ function G3SingularProof(Fld :
     rA1p3Id   := ideal<PR | GroebnerBasis(RedA1p3Stratum(DO) cat DORels)>;
 
 
-    rA1p4aId  := ideal<PR | GroebnerBasis(RedA1p4_aStratum(DO) cat DORels)>;
-    rA1p4bId  := ideal<PR | GroebnerBasis(RedA1p4_bStratum(DO) cat DORels)>;
+    rA1p4cubId  := ideal<PR | GroebnerBasis(RedA1p4cubStratum(DO) cat DORels)>;
+    rA1p4conId  := ideal<PR | GroebnerBasis(RedA1p4conStratum(DO) cat DORels)>;
     A2p2Id    := ideal<PR | GroebnerBasis(A2p2Stratum(DO) cat DORels)>;
     A1p2A2Id  := ideal<PR | GroebnerBasis(A1p2A2Stratum(DO) cat DORels)>;
 
@@ -366,41 +366,41 @@ function G3SingularProof(Fld :
         ret := IdAdd(A1p2A2Id, rA1p5Id) eq {rA1A3Id}; AllChecked and:= ret;
         "\tV(<A1^2A2>) meet V(<rA1^5>) = V(<rA1A3>)\t\t:", ret;
         "";
-        ret := IdAdd(rA1p4bId, A3Id) eq {A3Id}; AllChecked and:= ret;
-        "\tV(<rA1^4b>) meet V(<A3>) = V(<A3>)\t\t\t:", ret;
-        ret := IdAdd(rA1p4bId, A1A2p2Id) eq {rA1A3Id, A4Id}; AllChecked and:= ret;
-        "\tV(<rA1^4b>) meet V(<A1A2^2>)={V(<A4>),V(<rA1A3>)}:",  ret;
-        ret := IdAdd(rA1p4bId, rA1p3A2Id) eq {rA1A3Id}; AllChecked and:= ret;
-        "\tV(<rA1^4b>) meet V(<rA1^3A2>) = V(<rA1A3>)\t\t:", ret;
-        ret := IdAdd(rA1p4bId, rA1p5Id) eq {rA1p5Id}; AllChecked and:= ret;
-        "\tV(<rA1^4b>) meet V(<rA1^5>) = V(<rA1^5>)\t\t:", ret;
+        ret := IdAdd(rA1p4conId, A3Id) eq {A3Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_con>) meet V(<A3>) = V(<A3>)\t\t\t:", ret;
+        ret := IdAdd(rA1p4conId, A1A2p2Id) eq {rA1A3Id, A4Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_con>) meet V(<A1A2^2>)={V(<A4>),V(<rA1A3>)}\t:",  ret;
+        ret := IdAdd(rA1p4conId, rA1p3A2Id) eq {rA1A3Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_con>) meet V(<rA1^3A2>) = V(<rA1A3>)\t\t:", ret;
+        ret := IdAdd(rA1p4conId, rA1p5Id) eq {rA1p5Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_con>) meet V(<rA1^5>) = V(<rA1^5>)\t\t:", ret;
         "";
         "";
-        ret := IdAdd(rA1p4aId, A3Id) eq {rA1A3Id}; AllChecked and:= ret;
-        "\tV(<rA1^4a>) meet V(<A3>) = V(<rA1A3>)\t\t\t:", ret;
-        ret := IdAdd(rA1p4aId, A1A2p2Id) eq {rA1A3Id}; AllChecked and:= ret;
-        "\tV(<rA1^4a>) meet V(<A1A2^2>) = V(<rA1A3>)\t\t:",  ret;
-        ret := IdAdd(rA1p4aId, rA1p3A2Id) eq {rA1p3A2Id}; AllChecked and:= ret;
-        "\tV(<rA1^4a>) meet V(<rA1^3A2>) = V(<rA1^3A2>)\t\t:", ret;
-        ret := IdAdd(rA1p4aId, rA1p5Id) eq {rA1p5Id}; AllChecked and:= ret;
-        "\tV(<rA1^4a>) meet V(<rA1^5>) = V(<rA1^5>)\t\t:", ret;
+        ret := IdAdd(rA1p4cubId, A3Id) eq {rA1A3Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_cub>) meet V(<A3>) = V(<rA1A3>)\t\t:", ret;
+        ret := IdAdd(rA1p4cubId, A1A2p2Id) eq {rA1A3Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_cub>) meet V(<A1A2^2>) = V(<rA1A3>)\t\t:",  ret;
+        ret := IdAdd(rA1p4cubId, rA1p3A2Id) eq {rA1p3A2Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_cub>) meet V(<rA1^3A2>) = V(<rA1^3A2>)\t\t:", ret;
+        ret := IdAdd(rA1p4cubId, rA1p5Id) eq {rA1p5Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_cub>) meet V(<rA1^5>) = V(<rA1^5>)\t\t:", ret;
         "";
 
         "Intersections are as expected?\n";
         ret := IdAdd(A2p2Id, A1p2A2Id) eq {A1A2p2Id, A3Id}; AllChecked and:= ret;
-        "\tV(<A2^2>) meet V(<A1^2A2>)={V(<A1A2^2>),V(<A3>)}:", ret;
-        ret := IdAdd(A2p2Id, rA1p4bId) eq {A3Id}; AllChecked and:= ret;
-        "\tV(<A2^2>) meet V(<rA1^4b>) = V(<A3>)\t\t\t:", ret;
-        ret := IdAdd(A2p2Id, rA1p4aId) eq {rA1A3Id}; AllChecked and:= ret;
-        "\tV(<A2^2>) meet V(<rA1^4a>) = V(<rA1A3>)\t\t\t:", ret;
+        "\tV(<A2^2>) meet V(<A1^2A2>)={V(<A1A2^2>),V(<A3>)}\t:", ret;
+        ret := IdAdd(A2p2Id, rA1p4conId) eq {A3Id}; AllChecked and:= ret;
+        "\tV(<A2^2>) meet V(<rA1^4_con>) = V(<A3>)\t\t\t:", ret;
+        ret := IdAdd(A2p2Id, rA1p4cubId) eq {rA1A3Id}; AllChecked and:= ret;
+        "\tV(<A2^2>) meet V(<rA1^4_cub>) = V(<rA1A3>)\t\t:", ret;
         "";
-        ret := IdAdd(A1p2A2Id, rA1p4bId) eq {A3Id}; AllChecked and:= ret;
-        "\tV(<A1^2A2>) meet V(<rA1^4b>) = V(<A3>)\t\t\t:", ret;
-        ret := IdAdd(A1p2A2Id, rA1p4aId) eq {rA1p3A2Id}; AllChecked and:= ret;
-        "\tV(<A1^2A2>) meet V(<rA1^4a>) = V(<rA1^3A2>)\t\t:", ret;
+        ret := IdAdd(A1p2A2Id, rA1p4conId) eq {A3Id}; AllChecked and:= ret;
+        "\tV(<A1^2A2>) meet V(<rA1^4_con>) = V(<A3>)\t\t:", ret;
+        ret := IdAdd(A1p2A2Id, rA1p4cubId) eq {rA1p3A2Id}; AllChecked and:= ret;
+        "\tV(<A1^2A2>) meet V(<rA1^4_cub>) = V(<rA1^3A2>)\t\t:", ret;
         "";
-        ret := IdAdd(rA1p4bId, rA1p4aId) eq {rA1p5Id}; AllChecked and:= ret;
-        "\tV(<rA1^4b>) meet V(<rA1^4a>) = V(<rA1^5>)\t\t:", ret;
+        ret := IdAdd(rA1p4conId, rA1p4cubId) eq {rA1p5Id}; AllChecked and:= ret;
+        "\tV(<rA1^4_con>) meet V(<rA1^4_cub>) = V(<rA1^5>)\t\t:", ret;
 
         ""; "";
 
@@ -414,28 +414,28 @@ function G3SingularProof(Fld :
         "\tV(<A1A2>) meet V(<A2^2>) = V(<A2^2>)\t\t\t:", ret;
         ret := IdAdd(A1A2Id, A1p2A2Id) eq {A1p2A2Id}; AllChecked and:= ret;
         "\tV(<A1A2>) meet V(<A1^2A2>) = V(<A1^2A2>)\t\t:", ret;
-        ret := IdAdd(A1A2Id, rA1p4bId) eq {A3Id}; AllChecked and:= ret;
-        "\tV(<A1A2>) meet V(<rA1^4b>) = V(<A3>)\t\t\t:", ret;
-        ret := IdAdd(A1A2Id, rA1p4aId) eq {rA1p3A2Id}; AllChecked and:= ret;
-        "\tV(<A1A2>) meet V(<rA1^4a>) = V(<rA1^3A2>)\t\t:", ret;
+        ret := IdAdd(A1A2Id, rA1p4conId) eq {A3Id}; AllChecked and:= ret;
+        "\tV(<A1A2>) meet V(<rA1^4_con>) = V(<A3>)\t\t\t:", ret;
+        ret := IdAdd(A1A2Id, rA1p4cubId) eq {rA1p3A2Id}; AllChecked and:= ret;
+        "\tV(<A1A2>) meet V(<rA1^4_cub>) = V(<rA1^3A2>)\t\t:", ret;
         "";
         ret := IdAdd(A1p3Id, A2p2Id) eq {A1A2p2Id, A3Id}; AllChecked and:= ret;
-        "\tV(<A1^3>) meet V(<A2^2>) = {V(<A1A2^2>), V(<A3>)}:", ret;
+        "\tV(<A1^3>) meet V(<A2^2>) = {V(<A1A2^2>), V(<A3>)}\t:", ret;
         ret := IdAdd(A1p3Id, A1p2A2Id) eq {A1p2A2Id}; AllChecked and:= ret;
         "\tV(<A1^3>) meet V(<A1^2A2>) = V(<A1^2A2>)\t\t:", ret;
-        ret := IdAdd(A1p3Id, rA1p4bId) eq {rA1p4bId}; AllChecked and:= ret;
-        "\tV(<A1^3>) meet V(<rA1^4b>) = V(<rA1^4b>)\t\t:", ret;
-        ret := IdAdd(A1p3Id, rA1p4aId) eq {rA1p4aId}; AllChecked and:= ret;
-        "\tV(<A1^3>) meet V(<rA1^4a>) = V(<rA1^4a>)\t\t:", ret;
+        ret := IdAdd(A1p3Id, rA1p4conId) eq {rA1p4conId}; AllChecked and:= ret;
+        "\tV(<A1^3>) meet V(<rA1^4_con>) = V(<rA1^4_con>)\t\t:", ret;
+        ret := IdAdd(A1p3Id, rA1p4cubId) eq {rA1p4cubId}; AllChecked and:= ret;
+        "\tV(<A1^3>) meet V(<rA1^4_cub>) = V(<rA1^4_cub>)\t\t:", ret;
         "";
         ret := IdAdd(rA1p3Id, A2p2Id) eq {rA1A3Id}; AllChecked and:= ret;
         "\tV(<rA1^3>) meet V(<A2^2>) = V(<A1A3Id>)\t\t\t:", ret;
         ret := IdAdd(rA1p3Id, A1p2A2Id) eq {rA1p3A2Id}; AllChecked and:= ret;
         "\tV(<rA1^3>) meet V(<A1^2A2>) = V(<rA1p3A2>)\t\t:", ret;
-        ret := IdAdd(rA1p3Id, rA1p4bId) eq {rA1p5Id}; AllChecked and:= ret;
-        "\tV(<rA1^3>) meet V(<rA1^4b>) = V(<rA1^5>)\t\t:", ret;
-        ret := IdAdd(rA1p3Id, rA1p4aId) eq {rA1p4aId}; AllChecked and:= ret;
-        "\tV(<rA1^3>) meet V(<rA1^4a>) = V(<rA1^4a>)\t\t:", ret;
+        ret := IdAdd(rA1p3Id, rA1p4conId) eq {rA1p5Id}; AllChecked and:= ret;
+        "\tV(<rA1^3>) meet V(<rA1^4_con>) = V(<rA1^5>)\t\t:", ret;
+        ret := IdAdd(rA1p3Id, rA1p4cubId) eq {rA1p4cubId}; AllChecked and:= ret;
+        "\tV(<rA1^3>) meet V(<rA1^4_cub>) = V(<rA1^4_cub>)\t\t:", ret;
         "";
 
         "Intersections are as expected?\n";
@@ -444,8 +444,8 @@ function G3SingularProof(Fld :
         ret := IdAdd(A1A2Id, rA1p3Id) eq {rA1p3A2Id}; AllChecked and:= ret;
         "\tV(<A1A2>) meet V(<rA1^3>) = V(<rA1p3A2>)\t\t:", ret;
         "";
-        ret := IdAdd(A1p3Id, rA1p3Id) eq {rA1p4aId}; AllChecked and:= ret;
-        "\tV(<A1^3>) meet V(<rA1^3>) = V(<rA1^4a>)\t\t\t:", ret;
+        ret := IdAdd(A1p3Id, rA1p3Id) eq {rA1p4cubId}; AllChecked and:= ret;
+        "\tV(<A1^3>) meet V(<rA1^3>) = V(<rA1^4_cub>)\t\t:", ret;
 
         ""; "";
 
@@ -506,8 +506,8 @@ function G3SingularProof(Fld :
     HuiNF["A1A2"] := HuiNormalForms("(A1A2)" : Domain := DomQ) ;
     HuiNF["A3"] := HuiNormalForms("(A3)" : Domain := DomQ) ;
 
-    HuiNF["rA1^4a"] := HuiNormalForms("(rA1^4_a)" : Domain := DomQ) ;
-    HuiNF["rA1^4b"] := HuiNormalForms("(rA1^4_b)" : Domain := DomQ) ;
+    HuiNF["rA1^4_cub"] := HuiNormalForms("(rA1^4_cub)" : Domain := DomQ) ;
+    HuiNF["rA1^4_con"] := HuiNormalForms("(rA1^4_con)" : Domain := DomQ) ;
     HuiNF["A1^2A2"] := HuiNormalForms("(A1^2A2)" : Domain := DomQ) ;
     HuiNF["A2^2"] := HuiNormalForms("(A2^2)" : Domain := DomQ) ;
     HuiNF["rA1A3"] := HuiNormalForms("(rA1A3)" : Domain := DomQ) ;
@@ -517,8 +517,8 @@ function G3SingularProof(Fld :
     HuiNF["rA1^5"] := HuiNormalForms("(rA1^5)" : Domain := DomQ) ;
     HuiNF["rA1^3A2"] := HuiNormalForms("(rA1^3A2)" : Domain := DomQ) ;
     HuiNF["A1A2^2"] := HuiNormalForms("(A1A2^2)" : Domain := DomQ) ;
-    HuiNF["rA1^2A3a"] := HuiNormalForms("(rA1^2A3_a)" : Domain := DomQ) ;
-    HuiNF["rA1^2A3b"] := HuiNormalForms("(rA1^2A3_b)" : Domain := DomQ) ;
+    HuiNF["rA1^2A3a"] := HuiNormalForms("(rA1^2A3_cub)" : Domain := DomQ) ;
+    HuiNF["rA1^2A3b"] := HuiNormalForms("(rA1^2A3_con)" : Domain := DomQ) ;
     HuiNF["rA3^2"] := HuiNormalForms("(rA3^2)" : Domain := DomQ) ;
     HuiNF["A2A3"] := HuiNormalForms("(A2A3)" : Domain := DomQ) ;
     HuiNF["A1A4"] := HuiNormalForms("(A1A4)" : Domain := DomQ) ;
@@ -529,7 +529,7 @@ function G3SingularProof(Fld :
     HuiNF["rA1^3A3"] := HuiNormalForms("(rA1^3A3)" : Domain := DomQ) ;
     HuiNF["rA1A3^2"] := HuiNormalForms("(rA1A3^2)" : Domain := DomQ) ;
     HuiNF["rA1A2A3"] := HuiNormalForms("(rA1A2A3)" : Domain := DomQ) ;
-    HuiNF["rA1A5"] := HuiNormalForms("(rA1A5_a)" : Domain := DomQ) ;
+    HuiNF["rA1A5"] := HuiNormalForms("(rA1A5_con)" : Domain := DomQ) ;
     HuiNF["rA7"] := HuiNormalForms("(rA7)" : Domain := DomQ) ;
     HuiNF["c^2"] := HuiNormalForms("(c^2)" : Domain := DomQ) ;
     HuiNF["A2A4"] := HuiNormalForms("(A2A4)" : Domain := DomQ) ;
@@ -558,7 +558,7 @@ function G3SingularProof(Fld :
         DO := DixmierOhnoInvariants(f : degmax := 21) cat [0];
         a1p2inv := A1p2NFBiSingular(a00, a01, a10, a11);
 
-        for locus in [ "(A4)", "(rA1A3)", "(A2^3)", "(rA1^6)", "(A3)", "(A1A2^2)", "(rA1^3A2)", "(rA1^5)", "(A2^2)", "(A1^2A2)", "(rA1^4_b)", "(rA1^4_a)", "(A1A2)", "(A1^3)", "(rA1^3)" ] do
+        for locus in [ "(A4)", "(rA1A3)", "(A2^3)", "(rA1^6)", "(A3)", "(A1A2^2)", "(rA1^3A2)", "(rA1^5)", "(A2^2)", "(A1^2A2)", "(rA1^4_con)", "(rA1^4_cub)", "(A1A2)", "(A1^3)", "(rA1^3)" ] do
 
             printf "A1^2 normal forms in V(<%o>) have one more singularity?\n", locus;
             "--------------------";
@@ -612,7 +612,7 @@ function G3SingularProof(Fld :
         DO := DixmierOhnoInvariants(f : degmax := 21) cat [0];
         a1inv := A1NFBiSingular(a03, a04, a12, a13, a02);
 
-        for locus in [ "(A4)", "(rA1A3)", "(A2^3)", "(rA1^6)", "(A3)", "(A1A2^2)", "(rA1^3A2)", "(rA1^5)", "(A2^2)", "(A1^2A2)", "(rA1^4_b)", "(rA1^4_a)", "(A1A2)", "(A1^3)", "(rA1^3)", "(A2)", "(A1^2)" ] do
+        for locus in [ "(A4)", "(rA1A3)", "(A2^3)", "(rA1^6)", "(A3)", "(A1A2^2)", "(rA1^3A2)", "(rA1^5)", "(A2^2)", "(A1^2A2)", "(rA1^4_con)", "(rA1^4_cub)", "(A1A2)", "(A1^3)", "(rA1^3)", "(A2)", "(A1^2)" ] do
 
             printf "A1 normal forms in V(<%o>) have one more singularity?\n", locus;
             "--------------------";
@@ -696,7 +696,7 @@ function G3SingularProof(Fld :
         "rA1^2A3b normal forms in V(<A4>) have at least an A4 singularity?";
         "-----------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^2A3_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^2A3_con)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, A4Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {}) or
@@ -765,10 +765,10 @@ function G3SingularProof(Fld :
         "";
         /* OK => unstable, c^2 */
 
-        "rA1^4b normal forms in V(<A4>) have at least an A4 singularity?";
+        "rA1^4_con normal forms in V(<A4>) have at least an A4 singularity?";
         "---------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_con)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, A4Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {}) or
@@ -868,7 +868,7 @@ function G3SingularProof(Fld :
         "rA1^2A3b normal forms in V(<rA1A3>) have at least A1A3 singularities?";
         "---------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^2A3_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^2A3_con)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1A3Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^3, "A3" *}} ) or
@@ -952,18 +952,18 @@ function G3SingularProof(Fld :
         "";
         /* OK => unstable */
 
-        "rA1^4b normal forms in V(<rA1A3>) have at least A1A3 singularities?";
+        "rA1^4_con normal forms in V(<rA1A3>) have at least A1A3 singularities?";
         "-------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_con)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1A3Stratum);
         "";
         /* OK => unstable, rA1^3A3 */
 
-        "rA1^4a normal forms in V(<rA1A3>) have at least A1A3 singularities?";
+        "rA1^4_cub normal forms in V(<rA1A3>) have at least A1A3 singularities?";
         "-------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_a)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_cub)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1A3Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^3, "A3" *}} ) or
@@ -1141,7 +1141,7 @@ function G3SingularProof(Fld :
         "A1^4b normal forms in V(<rA1^6>) have at least an A1^6 singularity?";
         "-------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_con)" : Domain := DomQ);
         //Tp := NormFormSpecialized(f, RedA1p6Stratum);
         Tp := SpecialNFinSubStratum(f, RedA1p6Stratum, UnstableStratum); AllChecked and:= Tp;
         "Unstable:\t", Tp;
@@ -1153,7 +1153,7 @@ function G3SingularProof(Fld :
         "A1^4a normal forms in V(<rA1^6>) have at least an A1^6 singularity?";
         "-------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_a)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_cub)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1p6Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^6 *}} ) or
@@ -1243,10 +1243,10 @@ function G3SingularProof(Fld :
         "";
         /* OK => unstable, A1^2A3 */
 
-        "rA1^4b normal forms in V(<A3>) have at least an A3 singularity?";
+        "rA1^4_con normal forms in V(<A3>) have at least an A3 singularity?";
         "---------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_con)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, A3Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^2, "A3" *}} ) or
@@ -1389,10 +1389,10 @@ function G3SingularProof(Fld :
         "";
         /* OK => unstable */
 
-        "rA1^4a normal forms in V(<rA1^3A2>) have at least an rA1^3A2 singularity?";
+        "rA1^4_cub normal forms in V(<rA1^3A2>) have at least an rA1^3A2 singularity?";
         "-------------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_a)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_cub)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1p3A2Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^3, "A2" *}} ) or
@@ -1450,10 +1450,10 @@ function G3SingularProof(Fld :
         "********************";
         "";
 
-        "rA1^4b normal forms in V(<rA1^5>) have at least an rA1^5 singularity?";
+        "rA1^4_con normal forms in V(<rA1^5>) have at least an rA1^5 singularity?";
         "---------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_b)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_con)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1p5Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^5 *}} ) or
@@ -1463,10 +1463,10 @@ function G3SingularProof(Fld :
         "";
         /* OK => A1^5 */
 
-        "rA1^4a normal forms in V(<rA1^5>) have at least an rA1^5 singularity?";
+        "rA1^4_cub normal forms in V(<rA1^5>) have at least an rA1^5 singularity?";
         "---------------------------------------------------------------------";
         "";
-        f  := HuiNormalForms("(rA1^4_a)" : Domain := DomQ);
+        f  := HuiNormalForms("(rA1^4_cub)" : Domain := DomQ);
         Tp := NormFormSpecialized(f, RedA1p5Stratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^5 *}} ) or
@@ -1583,22 +1583,22 @@ function G3SingularProof(Fld :
         "";
 
 
-        "Stratum rA1^4b";
+        "Stratum rA1^4_con";
         "==============";
         "";
-        ret := Seqset(DixmierOhnoSingularityRelations("(rA1^4_b)", DixmierOhnoInvariants(HuiNF["rA1^4b"]))) eq {0}; AllChecked and:= ret;
-        "rA1^4b normal forms are in V(<rA1^4b>)\t:", ret;
+        ret := Seqset(DixmierOhnoSingularityRelations("(rA1^4_con)", DixmierOhnoInvariants(HuiNF["rA1^4_con"]))) eq {0}; AllChecked and:= ret;
+        "rA1^4_con normal forms are in V(<rA1^4_con>)\t:", ret;
         ""; "";
 
-        "Dimension 3 -> rA1^4b";
+        "Dimension 3 -> rA1^4_con";
         "*********************";
         "";
 
-        "A1^3 normal forms in V(<rA1^4b>) have at least an rA1^4b singularity?";
+        "A1^3 normal forms in V(<rA1^4_con>) have at least an rA1^4_con singularity?";
         "---------------------------------------------------------------------";
         "";
         f  := HuiNormalForms("(A1^3)" : Domain := DomQ);
-        Tp := NormFormSpecialized(f, RedA1p4_bStratum);
+        Tp := NormFormSpecialized(f, RedA1p4conStratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^4 *}, {* "A1"^^6 *}} ) or
             (Type(T) eq MonStgElt and T in { "unstable"} ) : T in Tp];
@@ -1607,22 +1607,22 @@ function G3SingularProof(Fld :
         "";
 
 
-        "Stratum rA1^4a";
+        "Stratum rA1^4_cub";
         "==============";
         "";
-        ret := Seqset(DixmierOhnoSingularityRelations("(rA1^4_a)", DixmierOhnoInvariants(HuiNF["rA1^4a"]))) eq {0}; AllChecked and:= ret;
-        "rA1^4a normal forms are in V(<rA1^4a>)\t:", ret;
+        ret := Seqset(DixmierOhnoSingularityRelations("(rA1^4_cub)", DixmierOhnoInvariants(HuiNF["rA1^4_cub"]))) eq {0}; AllChecked and:= ret;
+        "rA1^4_cub normal forms are in V(<rA1^4_cub>)\t:", ret;
         ""; "";
 
-        "Dimension 3 -> rA1^4a";
+        "Dimension 3 -> rA1^4_cub";
         "*********************";
         "";
 
-        "A1^3 normal forms in V(<rA1^4a>) have at least an rA1^4a singularity?";
+        "A1^3 normal forms in V(<rA1^4_cub>) have at least an rA1^4_cub singularity?";
         "---------------------------------------------------------------------";
         "";
         f  := HuiNormalForms("(A1^3)" : Domain := DomQ);
-        Tp := NormFormSpecialized(f, RedA1p4_aStratum);
+        Tp := NormFormSpecialized(f, RedA1p4cubStratum);
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^6 *}} ) or
             (Type(T) eq MonStgElt and T in { "unstable"} ) : T in Tp];
@@ -1630,14 +1630,14 @@ function G3SingularProof(Fld :
         "Singularities are as expected\t\t:", ret;
         "";
 
-        "rA1^3 normal forms in V(<rA1^4a>) have at least an rA1^4a singularity?";
+        "rA1^3 normal forms in V(<rA1^4_cub>) have at least an rA1^4_cub singularity?";
         "----------------------------------------------------------------------";
         "";
         Fa<a20, a21, a30> := FunctionField(Fld, 3);
         Pxyz<X,Y,Z> := PolynomialRing(Fa, 3);
         f := (X^2*a20+X*Y)*Z^2+(X^3*a30+X^2*Y*a21+X*Y^2)*Z+X^2*Y^2;
         // f  := HuiNormalForms("(rA1^3)" : Domain := DomQ);
-        Tp := NormFormSpecialized(f, RedA1p4_aStratum : VNames := ["a20", "a21", "a30"] );
+        Tp := NormFormSpecialized(f, RedA1p4cubStratum : VNames := ["a20", "a21", "a30"] );
         "";
         ret := &and[ (Type(T) eq SetMulti and T in {{* "A1"^^4 *}} ) or
             (Type(T) eq MonStgElt and T in { "unstable"} ) : T in Tp];
@@ -1913,7 +1913,7 @@ function A1p2NFBiSingular(a00, a01, a10, a11)
 
 end function;
 
-/* Main */
+// Main
 
 time ret :=
     G3SingularProof(Fld : DOInclusions := DOInclusions, HNFLargeDims := HNFLargeDims, HNFSmallDims := HNFSmallDims);

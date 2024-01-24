@@ -22,7 +22,7 @@
 
 forward HasQuarticReduc, HasHyperReduc, CuspStratum, CuspZeroStratum, CuspNodeStratum, IgusaFromDO, MinimizedValuationsModp, WPSMinimizePPowers, CuspGenus1Stratum, G1G2InvariantsFromDO, Genus1FromCuspDO, CuspDihedInvsFromDO, IgusaFromCuspDihedInvs, NodeDihedInvsFromDO, IgusaFromNodeDihedInvs, NodeGenus1Stratum, NodeGenus1FromDO, TwoCuspsStratum;
 
-forward A4Stratum, RedA1A3Stratum, RedA1p6Stratum, A2p3Stratum, A3Stratum, RedA1p5Stratum, RedA1p3A2Stratum, A1A2p2Stratum, RedA1p4_aStratum, RedA1p4_bStratum, A1p2A2Stratum, RedA1p3Stratum, A1p3Stratum, A1A2Stratum;
+forward A4Stratum, RedA1A3Stratum, RedA1p6Stratum, A2p3Stratum, A3Stratum, RedA1p5Stratum, RedA1p3A2Stratum, A1A2p2Stratum, RedA1p4cubStratum, RedA1p4conStratum, A1p2A2Stratum, RedA1p3Stratum, A1p3Stratum, A1A2Stratum;
 
 forward IsInStratumByValues, IsInStratumByValuations;
 
@@ -81,8 +81,8 @@ intrinsic QuarticTypeFromDO(DO::SeqEnum :
     /* Unstable quartics */
     if Seqset(_DO) eq {0} then
         return reduction select [] else &cat[
-            [ "(D4)", "(D5)", "(E6_a)", "(E6_b)" ],
-            [ "(rA5)", "(rA1D4)", "(rX9)", "(rD6)", "(rE7)", "(rA1A5_b)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1^3D4)", "(rA1D5_a)", "(rA1D5_b)", "(l^2c_a)", "(l^2c_b)", "(lll^2_a)", "(lll^2_b)", "(l^2l^2)", "(ll^3)", "(l^4)" ]
+            [ "(D4)", "(D5)", "(E6_1)", "(E6_0)" ],
+            [ "(rA5)", "(rA1D4)", "(rX9)", "(rD6)", "(rE7)", "(rA1A5_cub)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1^3D4)", "(rA1D5_cub)", "(rA1D5_con)", "(l^2c_sec)", "(l^2c_tan)", "(lll^2_sec)", "(lll^2_3rd)", "(l^2l^2)", "(ll^3)", "(l^4)" ]
             ];
     end if;
 
@@ -98,7 +98,7 @@ intrinsic QuarticTypeFromDO(DO::SeqEnum :
     if IsInStratum(_DO, WG, CS, CSWght, p) then
         return reduction select ["(singular hyper)"] else &cat[
             [ "(A4)", "(A5)", "(A1A4)", "(A6)", "(A2A4)" ],
-            [ "(rA7)", "(rA1A5_a)", "(c^2)" ]
+            [ "(rA7)", "(rA1A5_con)", "(c^2)" ]
             ];
     end if;
 
@@ -108,7 +108,7 @@ intrinsic QuarticTypeFromDO(DO::SeqEnum :
             [ "(0e=0e)", "(0m=0e)", "(0m=0m)", "(0n=0e)", "(0n=0m)", "(0n=0n)", "(1=0e)", "(1=0m)", "(1=0n)", "(1=1)", "(Z=0e)", "(Z=0m)", "(Z=0n)", "(Z=1)", "(Z=Z)" ]
             else &cat[
             [],
-            [ "(rA1A3)", "(rA1^2A3_a)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)" ]
+            [ "(rA1A3)", "(rA1^2A3_cub)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)" ]
             ];
     end if;
 
@@ -137,7 +137,7 @@ intrinsic QuarticTypeFromDO(DO::SeqEnum :
             [ "(0e=0e)", "(0m=0e)", "(0m=0m)", "(0n=0e)", "(0n=0m)", "(0n=0n)", "(1=0e)", "(1=0m)", "(1=0n)", "(1=1)", "(Z=0e)", "(Z=0m)", "(Z=0n)", "(Z=1)", "(Z=Z)" ]
             else &cat[
             [ "(A3)", "(A1A3)", "(A2A3)" ],
-            [ "(rA3^2)", "(rA1^2A3_b)" ]
+            [ "(rA3^2)", "(rA1^2A3_con)" ]
             ];
     end if;
 
@@ -168,19 +168,19 @@ intrinsic QuarticTypeFromDO(DO::SeqEnum :
     /* Dimension 2
      *************/
 
-     CS, CSWght := RedA1p4_aStratum(_DO);
+     CS, CSWght := RedA1p4cubStratum(_DO);
      if IsInStratum(_DO, WG, CS, CSWght, p) then
         return reduction select [ "(0---0n)" ] else &cat[
             [],
-            [ "(rA1^4_a)" ]
+            [ "(rA1^4_cub)" ]
             ];
     end if;
 
-    CS, CSWght := RedA1p4_bStratum(_DO);
+    CS, CSWght := RedA1p4conStratum(_DO);
     if IsInStratum(_DO, WG, CS, CSWght, p) then
         return reduction select [ "(0----0)" ] else &cat[
             [],
-            [ "(rA1^4_b)" ]
+            [ "(rA1^4_con)" ]
             ];
     end if;
 
@@ -275,7 +275,7 @@ intrinsic  DixmierOhnoSingularityRelations(type::MonStgElt, DOinv::SeqEnum) -> S
      *************/
      if type in &cat[
             [ "(A4)", "(A5)", "(A1A4)", "(A6)", "(A2A4)" ],
-            [ "(rA7)", "(rA1A5_a)", "(c^2)" ]
+            [ "(rA7)", "(rA1A5_con)", "(c^2)" ]
             ] then
             CS, CSWght := A4Stratum(DOinv);
             return CS, CSWght;
@@ -283,7 +283,7 @@ intrinsic  DixmierOhnoSingularityRelations(type::MonStgElt, DOinv::SeqEnum) -> S
 
      if type in &cat[
             [],
-            [ "(rA1A3)", "(rA1^2A3_a)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)" ]
+            [ "(rA1A3)", "(rA1^2A3_cub)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)" ]
             ] then
             CS, CSWght := RedA1A3Stratum(DOinv);
             return CS, CSWght;
@@ -310,7 +310,7 @@ intrinsic  DixmierOhnoSingularityRelations(type::MonStgElt, DOinv::SeqEnum) -> S
 
      if type in &cat[
             [ "(A3)", "(A1A3)", "(A2A3)" ],
-            [ "(rA3^2)", "(rA1^2A3_b)" ]
+            [ "(rA3^2)", "(rA1^2A3_con)" ]
             ] then
             CS, CSWght := A3Stratum(DOinv);
             return CS, CSWght;
@@ -345,17 +345,17 @@ intrinsic  DixmierOhnoSingularityRelations(type::MonStgElt, DOinv::SeqEnum) -> S
 
      if type in &cat[
             [],
-            [ "(rA1^4_a)" ]
+            [ "(rA1^4_cub)" ]
             ] then
-            CS, CSWght := RedA1p4_aStratum(DOinv);
+            CS, CSWght := RedA1p4cubStratum(DOinv);
             return CS, CSWght;
      end if;
 
      if type in &cat[
             [],
-            [ "(rA1^4_b)" ]
+            [ "(rA1^4_con)" ]
             ] then
-            CS, CSWght := RedA1p4_bStratum(DOinv);
+            CS, CSWght := RedA1p4conStratum(DOinv);
             return CS, CSWght;
      end if;
 
@@ -433,7 +433,7 @@ intrinsic  DixmierOhnoSingularityRelations(type::MonStgElt, DOinv::SeqEnum) -> S
     error
         "Unknown type \"" cat type cat "\"\n\n" cat
         "Available types are\n\n",
-        [ "(3)", "(A1)", "(A1A2)", "(A1A2^2)", "(A1A3)", "(A1A4)", "(A1^2)", "(A1^2A2)", "(A1^3)", "(A2)", "(A2A3)", "(A2A4)", "(A2^2)", "(A2^3)", "(A3)", "(A4)", "(A5)", "(A6)", "(c^2)", "(rA1A2A3)", "(rA1A3)", "(rA1A3^2)", "(rA1A5_a)", "(rA1^2A3_a)", "(rA1^2A3_b)", "(rA1^3)", "(rA1^3A2)", "(rA1^3A3)", "(rA1^4_a)", "(rA1^4_b)", "(rA1^5)", "(rA1^6)", "(rA3^2)", "(rA7)" ];
+        [ "(3)", "(A1)", "(A1A2)", "(A1A2^2)", "(A1A3)", "(A1A4)", "(A1^2)", "(A1^2A2)", "(A1^3)", "(A2)", "(A2A3)", "(A2A4)", "(A2^2)", "(A2^3)", "(A3)", "(A4)", "(A5)", "(A6)", "(c^2)", "(rA1A2A3)", "(rA1A3)", "(rA1A3^2)", "(rA1A5_con)", "(rA1^2A3_cub)", "(rA1^2A3_con)", "(rA1^3)", "(rA1^3A2)", "(rA1^3A3)", "(rA1^4_cub)", "(rA1^4_con)", "(rA1^5)", "(rA1^6)", "(rA3^2)", "(rA7)" ];
 
     return [], 0;
 
@@ -2736,7 +2736,7 @@ end function;
 
 /*  Quartics in the singularity strata
 	_ Irreducible : [ "(A4)", "(A5)", "(A1A4)", "(A6)", "(A2A4)" ],
-        _ Reducible   : [ "(A7)", "(A1A5_a)", "(c^2)" ]
+        _ Reducible   : [ "(A7)", "(rA1A5_con)", "(c^2)" ]
 
     Dimension 0 (vs 2 !)
 */
@@ -2765,7 +2765,7 @@ end function;
 
 /*  Quartics in the singularity strata
 	_ Irreducible :
-        _ Reducible   : [ "(A1A3)", "(A1^2A3_a)", "(A1A2A3)", "(A1A3^2)", "(A1^3A3)" ];
+        _ Reducible   : [ "(A1A3)", "(rA1^2A3_cub)", "(A1A2A3)", "(A1A3^2)", "(A1^3A3)" ];
 
     Dimension 0 (vs 2!)
 */
@@ -2794,7 +2794,7 @@ end function;
 
 /*  Quartics in the singularity strata
 	_ Irreducible : [ "(A3)", "(A1A3)", "(A2A3)" ] + A4Stratum
-        _ Reducible   : [ "(A3^2)", "(A1^2A3_b)" ] + RedA1A3Stratum + RedA4Stratum
+        _ Reducible   : [ "(A3^2)", "(rA1^2A3_con)" ] + RedA1A3Stratum + RedA4Stratum
 
     Dimension 1 (vs 3!)
 */
@@ -2937,12 +2937,12 @@ end function;
 
 /*  Quartics in the singularity strata
 	_ Irreducible :
-        _ Reducible   : [ "(A1^4_a)" ] + RedA1p5Stratum + RedA1p3A2Stratum;
+        _ Reducible   : [ "(rA1^4_cub)" ] + RedA1p5Stratum + RedA1p3A2Stratum;
 
     Dimension 2 (vs 2)
 */
 
-function RedA1p4_aStratum(DO)
+function RedA1p4cubStratum(DO)
 
     I03, I06, I09, J09, I12, J12, I15, J15, I18, J18, I21, J21, I27 := Explode(DO);
 
@@ -2971,11 +2971,11 @@ end function;
 
 /*  Quartics in the singularity strata
 	_ Irreducible : A3Stratum
-        _ Reducible   : [ "(A1^4_b)" ] + RedA3Stratum;
+        _ Reducible   : [ "(rA1^4_con)" ] + RedA3Stratum;
 
     Dimension 2 (vs 2)
 */
-function RedA1p4_bStratum(DO)
+function RedA1p4conStratum(DO)
 
     I03, I06, I09, J09, I12, J12, I15, J15, I18, J18, I21, J21, I27 := Explode(DO);
 

@@ -1,8 +1,6 @@
 /* Normal forms for non smooth quartics, following [Hui1979]
 
-  Two functions are supplied, HuiNormalForms(type) and HuiReducibleNormalForms(type). The former
-  returns irreducible normal forms listed p. 107 in [Hui1979], the latter non reducible normal
-  forms listed p. 108 and 109 in  [Hui1979]
+  The function defined here, HuiNormalForms(type), returns normal forms as listed p. 107 in [Hui1979].
 
   [Hui1979] Chung-man HUI, Plane quartic curves, phd, University of Liverpool, April 1979
  */
@@ -25,24 +23,24 @@
 
      any of these 21 Irreducible types :
 
-[ "(A1)", "(A2)", "(A1^2)", "(A3)", "(A4)", "(A1A2)", "(A1^3)", "(D4)", "(A2^2)", "(A1A3)", "(A1^2A2)", "(A5)", "(D5)", "(A2A3)", "(A1A4)", "(A1A2^2)", "(A6)", "(E6_a)", "(E6_b)", "(A2A4)", "(A2^3)" ]
+[ "(A1)", "(A2)", "(A1^2)", "(A3)", "(A4)", "(A1A2)", "(A1^3)", "(D4)", "(A2^2)", "(A1A3)", "(A1^2A2)", "(A5)", "(D5)", "(A2A3)", "(A1A4)", "(A1A2^2)", "(A6)", "(E6_1)", "(E6_0)", "(A2A4)", "(A2^3)" ]
 
 	among which 17 are not unstable :
 
 [ "(A1"), "(A2"), "(A1^2"), "(A3"), "(A4"), "(A1A2"), "(A1^3"), "(A2^2"), "(A1A3"), "(A1^2A2"), "(A5"), "(A2A3"), "(A1A4"), "(A1A2^2"), "(A6"), "(A2A4"), "(A2^3") ]
 
-	in other words, "(D4)", "(D5)", "(E6_a)", "(E6_b)" are the only unstable cases.
+	in other words, "(D4)", "(D5)", "(E6_1)", "(E6_0)" are the only unstable cases.
 
 
     or any of these 35 reducible types :
 
-  [ "(rA1^3)", "(rA1A3)", "(rA1^4_a)", "(rA1^4_b)", "(rA5)", "(rX9)", "(rA1D4)", "(rA3^2)", "(rA1^2A3_a)", "(rA1^2A3_b)", "(rA1^3A2)", "(rA1^5)", "(rD6)", "(rA7)", "(rE7)", "(rA1A5_a)", "(rA1A5_b)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)", "(rA1^3D4)", "(rA1^6)", "(rA1D5_a)", "(rA1D5_b)", "(l^2c_a)", "(l^2c_b)", "(lll^2_a)", "(lll^2_b)", "(c^2)", "(l^2l^2)", "(ll^3)", "(l^4)" ];
+  [ "(rA1^3)", "(rA1A3)", "(rA1^4_cub)", "(rA1^4_con)", "(rA5)", "(rX9)", "(rA1D4)", "(rA3^2)", "(rA1^2A3_cub)", "(rA1^2A3_con)", "(rA1^3A2)", "(rA1^5)", "(rD6)", "(rA7)", "(rE7)", "(rA1A5_con)", "(rA1A5_cub)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)", "(rA1^3D4)", "(rA1^6)", "(rA1D5_cub)", "(rA1D5_con)", "(l^2c_sec)", "(l^2c_tan)", "(lll^2_sec)", "(lll^2_3rd)", "(c^2)", "(l^2l^2)", "(ll^3)", "(l^4)" ];
 
 	among which 16 are not unstable :
 
-  [ "(rA1^3)", "(rA1A3)", "(rA1^4_a)", "(rA1^4_b)", "(rA3^2)", "(rA1^2A3_a)", "(rA1^2A3_b)", "(rA1^3A2)", "(rA1^5)", "(rA7)", "(rA1A5_a)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)", "(rA1^6)", "(c^2)" ]
+  [ "(rA1^3)", "(rA1A3)", "(rA1^4_cub)", "(rA1^4_con)", "(rA3^2)", "(rA1^2A3_cub)", "(rA1^2A3_con)", "(rA1^3A2)", "(rA1^5)", "(rA7)", "(rA1A5_con)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)", "(rA1^6)", "(c^2)" ]
 
-	in other words, "(rA5)", "(rX9)", "(rA1D4)", "(rD6)", "(rE7)", "(rA1A5_b)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1^3D4)", "(rA1D5_a)", "(rA1D5_b)", "(l^2c_a)", "(l^2c_b)", "(lll^2_a)", "(lll^2_b)", "(l^2l^2)", "(ll^3)", "(l^4)" are the only unstable cases.
+	in other words, "(rA5)", "(rX9)", "(rA1D4)", "(rD6)", "(rE7)", "(rA1A5_cub)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1^3D4)", "(rA1D5_cub)", "(rA1D5_con)", "(l^2c_sec)", "(l^2c_tan)", "(lll^2_sec)", "(lll^2_3rd)", "(l^2l^2)", "(ll^3)", "(l^4)" are the only unstable cases.
 
  */
 
@@ -253,7 +251,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
                       a31*X^3*Y                           + a04*Y^4;
 
 
-    when "(E6_a)" :               /* 1 triple point (unstable) */
+    when "(E6_1)" :               /* 1 triple point (unstable) */
         if Monic then a30 := K!1; end if;
         a22 := -a30; a04 := -a30;
 
@@ -261,7 +259,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (a30*X^3                                                )*Z   +
                                   a22*X^2*Y^2             + a04*Y^4;
 
-    when "(E6_b)" :               /* 1 triple point (unstable) */
+    when "(E6_0)" :               /* 1 triple point (unstable) */
         if Monic then a30 := K!1; end if;
         a04 := -a30;
 
@@ -316,7 +314,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (a30*X^3 + a21*X^2*Y + a12*X*Y^2                        )*Z   +
                                   a22*X^2*Y^2                      ;
 
-    when "(rA1^4_a)" :             /* A line that instersects a singular cubic three times   */
+    when "(rA1^4_cub)" :             /* A line that instersects a singular cubic three times   */
         if Monic then a22 := K!1; end if;
         a12 := a22; a11 := a22;
 
@@ -325,7 +323,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (          a21*X^2*Y + a12*X*Y^2                        )*Z   +
                                   a22*X^2*Y^2                      ;
 
-    when "(rA1^4_b)" :             /* two conics that instersects 4 times   */
+    when "(rA1^4_con)" :             /* two conics that instersects 4 times   */
         if Monic then a02 := K!1; end if;
         a21 := a20 + a22;
         a12 := a02 + a22;
@@ -375,7 +373,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (          a21*X^2*Y                                    )*Z   +
             a40*X^4                                                ;
 
-    when "(rA1^2A3_a)" :             /* a line that intersects 2 times a singular cubic, one intersection is a tangent  */
+    when "(rA1^2A3_cub)" :             /* a line that intersects 2 times a singular cubic, one intersection is a tangent  */
         if Monic then a20 := K!1; end if;
         a22 := a20; a12 := a20;
 
@@ -384,7 +382,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (          a21*X^2*Y + a12*X*Y^2                        )*Z   +
                                   a22*X^2*Y^2                      ;
 
-    when "(rA1^2A3_b)" :             /* two conics that intersects 3 times, one at a tangent */
+    when "(rA1^2A3_con)" :             /* two conics that intersects 3 times, one at a tangent */
         if Monic then a22 := K!1; end if;
         a12 := a02 + a22; a11 := a02 + a22;
         a21 := 2*a22; a20 := a22;
@@ -449,7 +447,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (a20*X^2                                                )*Z^2 +
                       a31*X^3*Y                                    ;
 
-    when "(rA1A5_a)" :             /* 2 conics that intersects at 2 points (one is a flex) */
+    when "(rA1A5_con)" :             /* 2 conics that intersects at 2 points (one is a flex) */
         if Monic then a22 := K!1; end if;
         a12 := a22; a11 := 2*a22; a01 := a22; a00 := a22;
 
@@ -460,7 +458,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (                      a12*X*Y^2                        )*Z   +
                                   a22*X^2*Y^2                      ;
 
-    when "(rA1A5_b)" :             /* a line tangent at a flex of a cubic that has a node (unstable)*/
+    when "(rA1A5_cub)" :             /* a line tangent at a flex of a cubic that has a node (unstable)*/
         if Monic then a11 := K!1; end if;
         a22 := a10; a21 := a10;
 
@@ -537,7 +535,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (          a21*X^2*Y + a12*X*Y^2                        )*Z
                                                                    ;
 
-    when "(rA1D5_a)" :             /* a line that intersects two times a cubic, one time at a cusp (unstable) */
+    when "(rA1D5_cub)" :             /* a line that intersects two times a cubic, one time at a cusp (unstable) */
         if Monic then a40 := K!1; end if;
         a11 := a40; a30 := a40;
 
@@ -547,7 +545,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
             a40*X^4                                                ;
 
 
-    when "(rA1D5_b)" :             /* a line that intersects two times a cubic, one time at a cusp (unstable) */
+    when "(rA1D5_con)" :             /* a line that intersects two times a cubic, one time at a cusp (unstable) */
         if Monic then a40 := K!1; end if;
         a11 := a40;
 
@@ -558,7 +556,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
         // Not isolated
         // -----------
 
-   when "(l^2c_a)" :               /* a double line instersect a conic (unstable) */
+   when "(l^2c_sec)" :               /* a double line instersect a conic (unstable) */
        if Monic then a21 := K!1; end if;
        a30 := a21; a31 := a21;
 
@@ -566,7 +564,7 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (a30*X^3 + a21*X^2*Y                                    )*Z   +
                       a31*X^3*Y                                    ;
 
-   when "(l^2c_b)" :               /* a double line tangent to a conic (unstable) */
+   when "(l^2c_tan)" :               /* a double line tangent to a conic (unstable) */
        if Monic then a02 := K!1; end if;
        a10 := a02;
 
@@ -574,12 +572,12 @@ intrinsic HuiNormalForms(type::MonStgElt :
            (a10*X                                                  )*Z^3 +
            (                      a02*Y^2                          )*Z^2 ;
 
-   when "(lll^2_a)" :               /* a double line intersect two others (unstable) */
+   when "(lll^2_sec)" :               /* a double line intersect two others (unstable) */
         if Monic then a11 := K!1; end if;
         f :=
            (          a11*X*Y                                      )*Z^2 ;
 
-   when "(lll^2_b)" :               /* a double line intersects two others at the same point (unstable) */
+   when "(lll^2_3rd)" :               /* a double line intersects two others at the same point (unstable) */
        if Monic then a20 := K!1; end if;
        a10 := a20;
 
@@ -616,11 +614,11 @@ intrinsic HuiNormalForms(type::MonStgElt :
        error
        "Unknown type \"" cat type cat "\"\n\n" cat
        "Available types are\n\n" cat
-       "Irreducible:", [ "(A1^3)", "(A1A3)", "(A1^4_a)", "(A1^4_b)", "(A5)", "(X9)", "(A1D4)", "(A3^2)", "(A1^2A3_a)", "(A1^2A3_b)", "(A1^3A2)", "(A1^5)", "(D6)", "(A7)", "(E7)", "(A1A5_a)", "(A1A5_b)", "(A1D6)", "(A2A5)", "(A1^2D4)", "(A1A2A3)", "(A1A3^2)", "(A1^3A3)", "(A1^3D4)", "(A1^6)", "(A1D5_a)", "(A1D5_b)", "(l^2c_a)", "(l^2c_b)", "(lll^2_a)", "(lll^2_b)", "(c^2)", "(l^2l^2)", "(ll^3)", "(l^4)" ],
+       "Irreducible:", [ "(A1)", "(A2)", "(A1^2)", "(A3)", "(A4)", "(A1A2)", "(A1^3)", "(D4)", "(A2^2)", "(A1A3)", "(A1^2A2)", "(A5)", "(D5)", "(A2A3)", "(A1A4)", "(A1A2^2)", "(A6)", "(E6_1)", "(E6_0)", "(A2A4)", "(A2^3)" ],
        "\n",
-       "Reducible:", [ "(rA1^3)", "(rA1A3)", "(rA1^4_a)", "(rA1^4_b)", "(rA5)", "(rX9)", "(rA1D4)", "(rA3^2)", "(rA1^2A3_a)", "(rA1^2A3_b)", "(rA1^3A2)", "(rA1^5)", "(rD6)", "(rA7)", "(rE7)", "(rA1A5_a)", "(rA1A5_b)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)", "(rA1^3D4)", "(rA1^6)", "(rA1D5_a)", "(rA1D5_b)"],
+       "Reducible:", [ "(rA1^3)", "(rA1A3)", "(rA1^4_cub)", "(rA1^4_con)", "(rA5)", "(rX9)", "(rA1D4)", "(rA3^2)", "(rA1^2A3_cub)", "(rA1^2A3_con)", "(rA1^3A2)", "(rA1^5)", "(rD6)", "(rA7)", "(rE7)", "(rA1A5_con)", "(rA1A5_cub)", "(rA1D6)", "(rA2A5)", "(rA1^2D4)", "(rA1A2A3)", "(rA1A3^2)", "(rA1^3A3)", "(rA1^3D4)", "(rA1^6)", "(rA1D5_cub)", "(rA1D5_con)"],
        "\n",
-       "Not isolated:", [ "(l^2c_a)", "(l^2c_b)", "(lll^2_a)", "(lll^2_b)", "(c^2)", "(l^2l^2)", "(ll^3)", "(l^4)" ];
+       "Not isolated:", [ "(l^2c_sec)", "(l^2c_tan)", "(lll^2_sec)", "(lll^2_3rd)", "(c^2)", "(l^2l^2)", "(ll^3)", "(l^4)" ];
 
    end case;
 
