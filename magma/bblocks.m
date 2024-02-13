@@ -328,20 +328,20 @@ function AssociatedBlock(V : SetsInsteadOfPairs := false)
 
     case dp:
         when [1,1]:
-            v := [w @@ rho : w in V | w ne 0][1];
+            v := [w @@ rho : w in V | not(IsZero(w))][1];
             if SetsInsteadOfPairs then
                 return <"Pl", { { {i : i in {1..8} | v[i] eq b} : b in GF(2) } } >;
             end if;
             return <"Pl", { {i : i in {1..8} | v[i] eq b} : b in GF(2) } >;
         when [1,2]:
-            v := [w @@ rho : w in V | w ne 0][1];
+            v := [w @@ rho : w in V | not(IsZero(w))][1];
             S := { {i : i in {1..8} | v[i] eq b} : b in GF(2) };
             if SetsInsteadOfPairs then
                 return <"Tw", {{[s : s in S | #s eq 2][1]}}>;
             end if;
             return <"Tw", [s : s in S | #s eq 2][1]>;
         when [2,2]:
-            vs := [w @@ rho : w in V | w ne 0];
+            vs := [w @@ rho : w in V | not(IsZero(w))];
             L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
             S2 := [s : s in L | #s eq 2][1];
             S3 := {s diff S2 : s in L | #(s diff S2) eq 3};
@@ -350,7 +350,7 @@ function AssociatedBlock(V : SetsInsteadOfPairs := false)
             end if;
             return <"TA", <S2, S3> >;
         when [2,4]:
-            vs := [w @@ rho : w in V | w ne 0];
+            vs := [w @@ rho : w in V | not(IsZero(w))];
             L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
             S3 := &join [s : s in L | #s eq 2 ];
             if SetsInsteadOfPairs then
@@ -358,14 +358,14 @@ function AssociatedBlock(V : SetsInsteadOfPairs := false)
             end if;
             return <"TB", S3>;
         when [3,3]:
-            vs := [w @@ rho : w in V | w ne 0];
+            vs := [w @@ rho : w in V | not(IsZero(w))];
             L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
             P1 := [s : s in L | #s eq 2 ];
             Q1 := &join P1;
             P2 := {s diff Q1 : s in L | #(s diff Q1) eq 2 };
             return <"CA", {Set(P1), P2}>;
         when [3,5]:
-            vs := [w @@ rho : w in V | w ne 0];
+            vs := [w @@ rho : w in V | not(IsZero(w))];
             L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
             F := [s : s in L | #s eq 2];
             P := {i : i in &join F | #{f : f in F | i in f} eq 1};
@@ -376,7 +376,7 @@ function AssociatedBlock(V : SetsInsteadOfPairs := false)
             end if;
             return <"CB", <P, {T1,T2}>>;
         when [3,7]:
-            vs := [w @@ rho : w in V | w ne 0];
+            vs := [w @@ rho : w in V | not(IsZero(w))];
             L := &join [ { {i : i in {1..8} | v[i] eq b} : b in GF(2) } : v in vs ];
             P1 := &join [ s : s in L | #s eq 2 ];
             P2 := {1..8} diff P1;
@@ -527,7 +527,7 @@ function IsotropicVector(V)
 
     W := V meet SymplecticComplement(V);
     if Dimension(W) eq 1 then
-        return [w : w in W | w ne 0][1];
+        return [w : w in W | not(IsZero(w))][1];
     end if;
     return V!0;
 
@@ -732,7 +732,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
     w := VlOctad - Min(Eltseq(VlOctad)) * Parent(VlOctad)![1 : i in [1..Rank(Parent(VlOctad))]];
 
     /* Smooth curves */
-    if w eq 0 then
+    if IsZero(w) then
         MyBenchStop(1, "Cayley Building Blocks", TT);
         return [**], Blocks, IsCompatible;
     end if; // Catch smooth curves
