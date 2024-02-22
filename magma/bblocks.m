@@ -432,7 +432,8 @@ function Act(M, V)
 
 end function;
 
-function DiagramAction(D, M : SetsInsteadOfPairs := false)
+intrinsic DiagramAction(D::List, M::Map : SetsInsteadOfPairs := false) -> List
+    {  Apply a Cremona transform to an octad picture }
 
     V := [* AssociatedSubspace(d) : d in D *];
     if SetsInsteadOfPairs then
@@ -440,7 +441,7 @@ function DiagramAction(D, M : SetsInsteadOfPairs := false)
     end if;
     return [* AssociatedBlock(Act(M,v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V *];
 
-end function;
+end intrinsic;
 
 function MinimalS8Representative(D)
 
