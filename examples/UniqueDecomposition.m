@@ -10,7 +10,7 @@
 // Building Block Precomputations
 _, KeySets        := PluckerCoordinates([ [0,0,0,0] : i in [1..8] ]);
 
-_, BuildingBlocks, IsBBCompatible := CayleyOctadDiagram(
+_, _, BuildingBlocks, IsBBCompatible := CayleyOctadDiagram(
     Vector([Rationals()|0 : i in [1..#KeySets]]));
 
 Tw,  Pl,  TA, TB,  CA, CB, CC,  Ln := Explode(BuildingBlocks);

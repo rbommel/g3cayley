@@ -8,7 +8,7 @@
    at magma startup (for example in the .magmarc file)
 */
 
-_, BuildingBlocks := CayleyOctadDiagram(Vector([Rationals()|0 : i in [1..70]]));
+_, _, BuildingBlocks := CayleyOctadDiagram(Vector([Rationals()|0 : i in [1..70]]));
 
 for B in BuildingBlocks do
 	for Bvectors in B do

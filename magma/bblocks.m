@@ -5,7 +5,7 @@
  *
  * intrinsic PluckerValuations(PlOctad::SeqEnum) -> ModTupFldElt
  *
- * intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
+ * intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, SeqEnum, Any, Any
  *
  ********************************************************************/
 
@@ -711,7 +711,66 @@ end function;
 // The data store for building blocks. Do not access directly!
 G3CayleyBBlocks := NewStore();
 
-intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
+forward GetBuildBlockIndexesCore;
+
+function GetBuildBlockIndexesCore(lvl, VlOctad, Didx, OD, GoodVectors)
+
+    if lvl gt #OD then return Didx; end if;
+
+    _Didx := [];
+
+    for D in Didx do
+        for GV in GoodVectors[lvl] do
+            _VlOctad := VlOctad - GV[1];
+            if Min(Eltseq(_VlOctad)) lt 0 then continue; end if;
+            ret := GetBuildBlockIndexesCore(lvl+1, _VlOctad,
+                [ D cat [* < OD[lvl][1], OD[lvl][2], GV[2] > *] ],
+                OD, GoodVectors);
+            _Didx cat:= ret;
+        end for;
+    end for;
+
+    return _Didx;
+end function;
+
+intrinsic GetBuildBlockIndexes(D::List, Dmult::SeqEnum, VlOctad::ModTupFldElt) -> List
+    {Add indexes to an octad picture}
+
+    tt := MyBenchStart(2, "Building Block Indexes");
+
+    /* Are computations already done ? */
+    bool, Things := StoreIsDefined(G3CayleyBBlocks, "Things");
+    if bool then
+        _, Blocks := StoreIsDefined(G3CayleyBBlocks, "Blocks");
+        _, ValLat := StoreIsDefined(G3CayleyBBlocks, "ValLat");
+    else
+        Things, Blocks, ValLat := CayleyBuildingBlocks();
+        StoreSet(G3CayleyBBlocks, "Things", Things);
+        StoreSet(G3CayleyBBlocks, "Blocks", Blocks);
+        StoreSet(G3CayleyBBlocks, "ValLat", ValLat);
+    end if;
+    Tw,  Pl,  TA, TB,  CA, CB, CC,  Ln := Explode(Blocks);
+
+    GoodVectors := [ [] : i in [1..#D]];
+    for i := 1 to #D do
+        t := D[i];
+        GoodVectors[i] := [];
+        for idx->v in (eval t[1])[t[2]] do
+            if Min(Eltseq(VlOctad - Dmult[i] * v)) lt 0 then continue v; end if;
+            Include(~GoodVectors[i],  < Dmult[i] * v, idx >);
+        end for;
+    end for;
+
+    ret := GetBuildBlockIndexesCore(1, VlOctad, [ [**] ], D, GoodVectors);
+
+    MyBenchStop(2, "Building Block Indexes", tt);
+
+    return ret;
+end intrinsic;
+
+
+intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
+                             UsefulThings := [**], BuildBlockIndexes := false) -> List, SeqEnum, Any, Any
     {Compute an octad diagram}
 
     TT := MyBenchStart(1, "Cayley Building Blocks");
@@ -729,20 +788,22 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
     end if;
     Tw,  Pl,  TA, TB,  CA, CB, CC,  Ln := Explode(Blocks);
 
+    ThingsToBeUsed := #UsefulThings eq 0 select Things else UsefulThings;
+
     /* Normalizations, if needed */
     w := VlOctad - Min(Eltseq(VlOctad)) * Parent(VlOctad)![1 : i in [1..Rank(Parent(VlOctad))]];
 
     /* Smooth curves */
     if IsZero(w) then
         MyBenchStop(1, "Cayley Building Blocks", TT);
-        return [**], Blocks, IsCompatible;
+        return [**], [], Blocks, IsCompatible;
     end if; // Catch smooth curves
 
     tt := MyBenchStart(2, "compatible Building Blocks");
     PotentialThings := {Integers() |};
-    GoodVectors := [ [] : i in [1..#Things]];
-    for i := 1 to #Things do
-        t := Things[i];
+    GoodVectors := [ [] : i in [1..#ThingsToBeUsed]];
+    for i := 1 to #ThingsToBeUsed do
+        t := ThingsToBeUsed[i];
         GoodVectors[i] := [];
         for v in (eval t[1])[t[2]] do
             if Min(Eltseq(w - v)) lt 0 then continue v; end if;
@@ -758,7 +819,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
     for i in PotentialThings do
         for S in CompatibleSubsets do
             for j in S do
-                if not(IsCompatible(Things[i], Things[j])) then
+                if not(IsCompatible(ThingsToBeUsed[i], ThingsToBeUsed[j])) then
                     continue S;
                 end if;
             end for;
@@ -790,21 +851,22 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
     Sols := [];
     CandidateSubspaces := [ i : i in [1..#Subspaces] | W eq Subspaces[i] ];
     for i in CandidateSubspaces do
-        crd, nulspc := Solution(Matrix([Subspaces[i].k : k in [1..Dimension(Subspaces[i])]]), w);
+        Dmult, nulspc := Solution(Matrix([Subspaces[i].k : k in [1..Dimension(Subspaces[i])]]), w);
         assert Dimension(nulspc) eq 0;
-        if Min(Eltseq(crd)) ge 0 then Append(~Sols, i); end if;
+        Dmult := Eltseq(Dmult);
+        if Min(Dmult) ge 0 then Append(~Sols, i); end if;
     end for;
     vprintf G3Cayley, 2:  "%o=> %o solutions;\n", MyBenchIndent(""), #Sols;
     assert #Sols eq 1;
     vprintf G3Cayley, 2:
         "%o=> Decomposition is %o", MyBenchIndent(""),
-        [* Things[k] : k in PotentialSubsets[Sols[1]] *];
+        [* ThingsToBeUsed[k] : k in PotentialSubsets[Sols[1]] *];
     vprintf G3Cayley, 2:
-        " with linear combination vector %o;\n", crd;
+        " with linear combination vector %o;\n", Dmult;
     MyBenchStop(2, "A linear filtering", tt);
 
     tt := MyBenchStart(2, "Candy degenerancy filtering");
-    D := [* Things[k] : k in PotentialSubsets[Sols[1]] *];
+    D := [* ThingsToBeUsed[k] : k in PotentialSubsets[Sols[1]] *];
     if "C" in {d[1][1] : d in D} then
         // Remove degenerate block if necessary
         V := AssociatedSubspace([d : d in D | d[1][1] eq "C"][1]);
@@ -816,6 +878,6 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List, Any, Any
 
     MyBenchStop(1, "Cayley Building Blocks", TT);
 
-    return D, Blocks, IsCompatible;
+    return D, Dmult, Blocks, IsCompatible;
 
 end intrinsic;
