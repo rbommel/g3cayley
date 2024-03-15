@@ -762,25 +762,34 @@ intrinsic CayleyOctadPGLOrbit(O::SeqEnum) -> SeqEnum
 
 end intrinsic;
 
-intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5})->ModTupFldElt
-{ Compute the valuation data of the normalised octad. The optional parameter S determines which points of the octad will be at the standard position (default: 1,2,3,4,5). }
+intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5}, StdPosition := false)->ModTupFldElt
+	{ Compute the valuation data of the normalised octad. The optional parameter S determines which points of the octad will be at the standard position (default: 1,2,3,4,5). }
 	assert(#S eq 5);
+
 	W8 := [ &+[V70.j : j in [1..70] | i in KeySets[j]] : i in [1..8] ];
 	SKeys := [i : i in [1..70] | KeySets[i] subset S];
 	B1 := [v1] cat W8;
 	M1 := [ [v[i] : i in SKeys] : v in B1 ];
 	K1 := Basis(Kernel(Matrix(M1)));
-	assert [ <i, b[1] eq 1> : i->b in K1 ] eq [<1,true>,<2,false>,<3,false>,<4,false>];
-	B2 := [ &+[w[i]*v : i->v in B1 ] : w in K1 ];
+	assert [ <i, b[1] eq 1> : i->b in K1 ] eq [ <1,true>, <2,false>, <3,false>, <4,false> ];
+
+	B2 := [ &+[ w[i] * v : i->v in B1 ] : w in K1 ];
 	M2 := [ [Min([v[i] : i in [1..70] | #(KeySets[i] meet S) eq 3 and j in KeySets[i]]) : j in {1..8} diff S] : v in B2 ];
 	K2 := Basis(Kernel(Matrix(M2)));
 	assert #K2 eq 1;
-	v3 := &+[ K2[1][i]*v : i->v in B2 ];
+	v3 := &+[ K2[1][i] * v : i->v in B2 ];
+
+	if StdPosition then
+		p := AssociativeArray(); for j := 1 to #KeySets do p[KeySets[j]] := v3[j]; end for;
+		L := Sort(Setseq(S)) cat Sort(Setseq({1..8} diff S));
+		for i->K in KeySets do v3[i] := p[ {L[e] : e in K} ]; end for;
+	end if;
+
 	return v3;
 end intrinsic;
 
 intrinsic CayleyOctadCremonaOrbit(Octad::SeqEnum) -> SeqEnum
-    {Orbit of an octad under Cremona action, restricted to octads in standard position}
+	{Orbit of an octad under Cremona action, restricted to octads in standard position}
 
     Indexes := {};
     for S in Subsets({1..8}, 4) do
