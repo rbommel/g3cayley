@@ -432,7 +432,7 @@ function Act(M, V)
 
 end function;
 
-intrinsic DiagramAction(D::List, M::Map : SetsInsteadOfPairs := false) -> List
+intrinsic DiagramAction(D::List, M::ModMatFldElt : SetsInsteadOfPairs := false) -> List
     {  Apply a Cremona transform to an octad picture }
 
     V := [* AssociatedSubspace(d) : d in D *];

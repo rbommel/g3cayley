@@ -1,4 +1,4 @@
-import "bblocks.m" : CreAction, DiagramAction, MinimalS8Representative;
+import "bblocks.m" : CreAction, MinimalS8Representative;
 
 /* Types */
 AllQuarticTypes := [
