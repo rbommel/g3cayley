@@ -289,6 +289,17 @@ function CayleyBuildingBlocks()
             assert(vva in W);
             Append(~va, vva);
         end for;
+        for i in [1..8] do
+            // 7 points on a plane with 3 colliding
+            t := [x diff {i} : x in s | i in x][1];
+            q := [x : x in s | not(i in x)][1];
+            vva :=
+                &+[v[k] : k in KeySets | k subset (t join q)] +
+                &+[v[t join {j}] : j in q] + 2*v[t join {i}] + 
+                &+[v[p join {j} join {i}] : p in Subsets(t,2), j in q];
+            assert(vva in W);
+            Append(~va, vva);
+        end for;
         Ln[s] := va;
         Append(~Things, <"Ln", s>);
     end for;
@@ -770,7 +781,7 @@ end intrinsic;
 
 
 intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
-                             UsefulThings := [**], BuildBlockIndexes := false) -> List, SeqEnum, Any, Any
+                             UsefulThings := [**], BuildBlockIndexes := false, HideAuxiliaryBlocks := true) -> List, SeqEnum, Any, Any
     {Compute an octad diagram}
 
     TT := MyBenchStart(1, "Cayley Building Blocks");
@@ -808,7 +819,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
         for v in (eval t[1])[t[2]] do
             if Min(Eltseq(w - v)) lt 0 then continue v; end if;
             Include(~PotentialThings, i);
-            Include(~GoodVectors[i], v);
+            Include(~GoodVectors[i], v);    // (TODO) in case GoodVectors has more than one vector, the line defining Dmult and nulspc will fail.
         end for;
     end for;
     vprintf G3Cayley, 2:  "%o=> %o building blocks;\n", MyBenchIndent(""), #PotentialThings;
@@ -867,7 +878,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
 
     tt := MyBenchStart(2, "Candy degenerancy filtering");
     D := [* ThingsToBeUsed[k] : k in PotentialSubsets[Sols[1]] *];
-    if "C" in {d[1][1] : d in D} then
+    if HideAuxiliaryBlocks and "C" in {d[1][1] : d in D} then
         // Remove degenerate block if necessary
         V := AssociatedSubspace([d : d in D | d[1][1] eq "C"][1]);
         VVperp := V meet SymplecticComplement(V);
