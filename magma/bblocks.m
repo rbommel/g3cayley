@@ -865,7 +865,7 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
         Dmult, nulspc := Solution(Matrix([Subspaces[i].k : k in [1..Dimension(Subspaces[i])]]), w);
         assert Dimension(nulspc) eq 0;
         Dmult := Eltseq(Dmult);
-        if Min(Dmult) ge 0 then Append(~Sols, i); end if;
+        if Min(Dmult) ge 0 then Append(~Sols, i); DmultS := Dmult; end if;
     end for;
     vprintf G3Cayley, 2:  "%o=> %o solutions;\n", MyBenchIndent(""), #Sols;
     assert #Sols eq 1;
@@ -889,6 +889,6 @@ intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
 
     MyBenchStop(1, "Cayley Building Blocks", TT);
 
-    return D, Dmult, Blocks, IsCompatible;
+    return D, DmultS, Blocks, IsCompatible;
 
 end intrinsic;
