@@ -91,6 +91,7 @@ while #C gt 1 do
 end while;
 
 // Create the quotient space in which the computations will take place.
+V70 := Parent(V[1,2,1]);
 W8 := sub< V70 | [ &+[V70.j : j in [1..70] | i in KeySets[j]] : i in [1..8] ] >;
 Wquo, phi := V70 / W8;
 Vquo := [sub<Wquo | [ phi(x) : x in y[2]]> : y in V];
