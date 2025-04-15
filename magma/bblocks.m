@@ -60,10 +60,10 @@ intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
     return PlOctad, KeySets;
 end intrinsic;
 
-intrinsic PluckerValuations(PlOctad::SeqEnum) -> ModTupFldElt
+intrinsic PluckerValuations(PlOctad::SeqEnum : _Valuation := Valuation) -> ModTupFldElt
     { On input of a plucker sequence, this function returns its 70-dimensional valuation vector }
 
-    w := V70![ Valuation(pl) : pl in PlOctad];
+    w := V70![ _Valuation(pl) : pl in PlOctad];
     w := w - Min(Eltseq(w)) * Parent(w)![1 : i in [1..Rank(V70)]];
 
     return w;
