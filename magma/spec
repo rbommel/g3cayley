@@ -6,6 +6,7 @@
   g3thetas.m
   models.m
   reduction.m
+  octadgeometry.m
 
   singularities
   {

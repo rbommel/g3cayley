@@ -73,6 +73,9 @@ intrinsic PluckerValuations(PlOctad::SeqEnum) -> ModTupFldElt
 intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5})->ModTupFldElt
 { Compute the valuation data of the normalised octad. The optional parameter S determines which points of the octad will be at the standard position (default: 1,2,3,4,5). }
 
+intrinsic CayleyOctadGeometry(VlOctad::SeqEnum) -> SetEnum
+{On input Plucker valuations, return colliding points, maximal lines and maximal planes (taking care of point multiplicities, i.e. scheme-thoretically) }
+
 intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt) -> List
 {Compute an octad diagram}
 
