@@ -10,14 +10,14 @@
 import "bblocks.m" : KeySets;
 
 // Collision
-function AreCollidingPoints(ValPrc, points : silent := false)
+function AreCollidingPoints(SigTable, points : silent := false)
 
-	if #points gt 2 then return &and{ $$(ValPrc, S) : S in Subsets(points, 2) }; end if;
+	if #points gt 2 then return &and{ $$(SigTable, S) : S in Subsets(points, 2) }; end if;
 
-	vm2 := ValPrc[3];
+	sig2 := SigTable[3];
 
 	/* 1 pair? */
-	ret := vm2[points] gt 0;
+	ret := sig2[points] gt 0;
 	vprintf G3Cayley: silent or not ret select "" else "Point: Pts^2 -> " * Sprintf("%o", points) * "\n";
 
     return ret;
@@ -25,24 +25,24 @@ end function;
 
 
 // Collinearity
-function AreCollinearPoints(ValPrc, points : silent := false)
+function AreCollinearPoints(SigTable, points : silent := false)
 
-	if #points gt 3 then return &and{ $$(ValPrc, S) : S in Subsets(points, 3) }; end if;
+	if #points gt 3 then return &and{ $$(SigTable, S) : S in Subsets(points, 3) }; end if;
 
-	vm3 := ValPrc[2]; vm2 := ValPrc[3];
+	sig3 := SigTable[2]; sig2 := SigTable[3];
 
-	Pairs := { pair : pair in Subsets(points, 2) | AreCollidingPoints(ValPrc, pair : silent := true) };
+	Pairs := { pair : pair in Subsets(points, 2) | AreCollidingPoints(SigTable, pair : silent := true) };
 
 	/* 3 distinct points? */
     if #Pairs eq 0 then
-		ret := vm3[points] gt 0;
+		ret := sig3[points] gt 0;
 		vprintf G3Cayley: silent or not ret select "" else "Line: Pts^3 -> " * Sprintf("%o", points) * "\n";
 		return ret;
 	end if;
 
 	/* 1 pair? */
 	if #Pairs eq 1 then
-		ret := vm3[points] gt vm2[Representative(Pairs)];
+		ret := sig3[points] gt sig2[Representative(Pairs)];
 		vprintf G3Cayley: silent or not ret select "" else "Line: Pair + Pts -> " * Sprintf("%o", points) * "\n", Representative(Pairs), points diff Representative(Pairs);
 		return ret;
 	end if;
@@ -50,22 +50,21 @@ function AreCollinearPoints(ValPrc, points : silent := false)
 	/* So, 1 triple */
 	assert #Pairs eq 3;
 
-	basepoint := Representative(points); otherpoints := points diff {basepoint};
-	ret := vm3[points] gt &+[vm2[{basepoint, pt}] : pt in otherpoints];
+	ret := sig3[points] gt &+[ sig2[pair] : pair in Pairs ];
 	vprintf G3Cayley: silent or not ret select "" else "Line: Triple -> " * Sprintf("%o", points) * "\n";
 	return ret;
 
 end function;
 
 // Coplanarity
-function AreCoplanarPoints(ValPrc, points : silent := false)
+function AreCoplanarPoints(SigTable, points : silent := false)
 
-	if #points gt 4 then return &and{ $$(ValPrc, S) : S in Subsets(points, 4) }; end if;
+	if #points gt 4 then return &and{ $$(SigTable, S) : S in Subsets(points, 4) }; end if;
 
-	vm4 := ValPrc[1]; vm3 := ValPrc[2]; vm2 := ValPrc[3];
+	sig4 := SigTable[1]; sig3 := SigTable[2]; sig2 := SigTable[3];
 
 	/* Collinear points */
-	Lines := { triple : triple in Subsets(points, 3) | AreCollinearPoints(ValPrc, triple) };
+	Lines := { triple : triple in Subsets(points, 3) | AreCollinearPoints(SigTable, triple) };
 
 	/* 4 collinear points? */
 	if #Lines eq 4 then
@@ -80,44 +79,65 @@ function AreCoplanarPoints(ValPrc, points : silent := false)
 	end if;
 
 	/* From now, the only possible degeneracies are colliding points */
-	Pairs := { pair : pair in Subsets(points, 2) | AreCollidingPoints(ValPrc, pair : silent := true) };
+	Pairs := { pair : pair in Subsets(points, 2) | AreCollidingPoints(SigTable, pair : silent := true) };
 
 	/* 4 distinct points? */
     if #Pairs eq 0 then
-		ret := vm4[points] gt 0;
+		ret := sig4[points] gt 0;
 		vprintf G3Cayley: silent or not ret select "" else "Plane: Pts^4 -> " * Sprintf("%o", points) * "\n";
 		return ret;
 	end if;
 
 	/* One pair + 2 distinct points? */
     if #Pairs eq 1 then
-		ret := vm4[points] gt vm2[Representative(Pairs)];
+		ret := sig4[points] gt sig2[Representative(Pairs)];
 		vprintf G3Cayley: silent or not ret select "" else "Plane: Pair + Pts^2 -> " * Sprintf("%o + %o", Representative(Pairs), points diff Representative(Pairs)) * "\n";
 		return ret;
 	end if;
 
 	/* Two distinct pairs? */
     if #Pairs eq 2 then
-		ret := vm4[&join Pairs] gt &+[ vm2[pair] : pair in Pairs ];
+		ret := sig4[points] gt &+[ sig2[pair] : pair in Pairs ];
 		vprintf G3Cayley: silent or not ret select "" else "Plane: Pair + Pair -> " * Sprintf("%o", Pairs) * "\n";
 		return ret;
 	end if;
 
 	/* One triple + 1 point? */
     if #Pairs eq 3 then
-		triple := &join Pairs; point := points diff triple;
-		basepoint := Representative(&join Pairs); otherpoints := (&join Pairs) diff { basepoint };
-		ret := vm4[points] gt &+[ vm2[{pt, basepoint}] : pt in otherpoints];
-		vprintf G3Cayley: silent or not ret select "" else "Plane: Triple + Pts -> " * Sprintf("%o + %o", &join Pairs, point) * "\n";
+		triple := &join Pairs; point := Representative(points diff triple);
+		ret := sig4[points] gt sig3[triple];
+		vprintf G3Cayley: silent or not ret select "" else "Plane: Triple + Pts -> " * Sprintf("%o + %o", triple, point) * "\n";
 		return ret;
 	end if;
 
 	/* So, one quadruple point */
 	assert #Pairs eq 6;
 
-	basepoint := Representative(points); otherpoints := points diff { basepoint };
+	// Order them in HNF form => pair subset triple subset points
+	pair := Representative(Pairs);
+	for S in Pairs do
+		if sig2[S] gt sig2[pair] then pair := S; end if;
+	end for;
 
-	ret := vm4[points] gt &+[ vm2[{basepoint, pt}] : pt in otherpoints];
+	triple := Include(pair, Representative(points diff pair));
+	for pt in points diff pair do
+		if sig3[Include(pair, pt)] gt sig3[triple] then
+			triple := Include(pair, pt);
+		end if;
+	end for;
+
+	ret :=
+		(sig3[triple] gt &+[sig2[S] : S in Subsets(triple, 2)])
+		or
+		(sig4[points] gt
+		 (&+[sig3[Include(pair, pt)] : pt in points diff pair]
+		 - sig2[pair] + sig2[points diff pair]));
+
+	if ret eq false then
+		/* Partial result here, we can not cover all the P3 reduction types */
+		printf "Warning: Uncertainty in the non-coplanar reduction of the points %o\n", points;
+	end if;
+
 	vprintf G3Cayley: silent or not ret select "" else "Plane: Quadruple -> " * Sprintf("%o", points) * "\n";
 	return ret;
 
@@ -162,27 +182,25 @@ function PluckerValuationMinima(VlOctad)
 
 	AllPoints := {1..8};
 
-	vm4 := AssociativeArray();
-	for i->XYZW in KeySets do vm4[XYZW] := VlOctad[i]; end for;
+	sig4 := AssociativeArray();
+	for i->XYZW in KeySets do sig4[XYZW] := VlOctad[i]; end for;
 
-	vm3 := AssociativeArray();
+	sig3 := AssociativeArray();
 	for XYZ in Subsets(AllPoints, 3) do
-		vm3[XYZ] := Min([ vm4[XYZW] : XYZW in Keys(vm4) | XYZ subset XYZW ]);
+		sig3[XYZ] := Min([ sig4[XYZW] : XYZW in Keys(sig4) | XYZ subset XYZW ]);
 	end for;
 
-	vm2 := AssociativeArray();
+	sig2 := AssociativeArray();
 	for XY in Subsets(AllPoints, 2) do
-		vm2[XY] := Min([ vm3[XYZ] : XYZ in Keys(vm3) | XY subset XYZ ]);
+		sig2[XY] := Min([ sig3[XYZ] : XYZ in Keys(sig3) | XY subset XYZ ]);
 	end for;
 
-/*
-	vm1 := AssociativeArray();
+	sig1 := AssociativeArray();
 	for X in Subsets(AllPoints, 1) do
-		vm1[X] := Min([ vm2[XY] : XY in Keys(vm2) | X subset XY ]);
+		sig1[X] := Min([ sig2[XY] : XY in Keys(sig2) | X subset XY ]);
 	end for;
-*/
 
-	return <vm4, vm3, vm2 /*, vm1 */>;
+	return <sig4, sig3, sig2, sig1>;
 
 end function;
 
@@ -192,14 +210,14 @@ intrinsic CayleyOctadGeometry(VlOctad::ModTupFldElt) -> SetEnum
 
 	assert Min(Eltseq(VlOctad)) eq 0;
 
-	ValPrc := PluckerValuationMinima(VlOctad);
+	SigTable := PluckerValuationMinima(VlOctad);
 
 	Points := {1..8};
 
 
 	// Colliding pairs
 	CollidingPairs := { pair :
-						pair in Subsets(Points, 2) | AreCollidingPoints(ValPrc, pair) };
+						pair in Subsets(Points, 2) | AreCollidingPoints(SigTable, pair) };
 
 	// Colliding closure
 	CollidingPoints := MaximalPointClosure(CollidingPairs);
@@ -207,7 +225,7 @@ intrinsic CayleyOctadGeometry(VlOctad::ModTupFldElt) -> SetEnum
 
 	// Collinear triples
 	CollinearTriples := { triple :
-						 triple in Subsets(Points, 3) | AreCollinearPoints(ValPrc, triple) };
+						 triple in Subsets(Points, 3) | AreCollinearPoints(SigTable, triple) };
 
 	// Collinear closure
 	CollinearPoints := MaximalPointClosure(CollinearTriples);
@@ -215,7 +233,7 @@ intrinsic CayleyOctadGeometry(VlOctad::ModTupFldElt) -> SetEnum
 
 	// Coplanar quadruples
 	CoplanarQuadruples := { quadruple :
-						    quadruple in Subsets(Points, 4) | AreCoplanarPoints(ValPrc, quadruple) };
+						    quadruple in Subsets(Points, 4) | AreCoplanarPoints(SigTable, quadruple) };
 
 	// Coplanar closure
 	CoplanarPoints := MaximalPointClosure(CoplanarQuadruples);
