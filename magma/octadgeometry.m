@@ -116,12 +116,12 @@ function AreCoplanarPoints(SigTable, points : silent := false)
 	// Order them in HNF form => pair subset triple subset points
 	pair := Representative(Pairs);
 	for S in Pairs do
-		if sig2[S] gt sig2[pair] then pair := S; end if;
+		if sig2[S] lt sig2[pair] then pair := S; end if;
 	end for;
 
 	triple := Include(pair, Representative(points diff pair));
 	for pt in points diff pair do
-		if sig3[Include(pair, pt)] gt sig3[triple] then
+		if sig3[Include(pair, pt)] lt sig3[triple] then
 			triple := Include(pair, pt);
 		end if;
 	end for;
