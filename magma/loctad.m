@@ -813,3 +813,29 @@ intrinsic CayleyOctadCremonaOrbit(Octad::SeqEnum) -> SeqEnum
 
 	return CremonaOrbit;
 end intrinsic;
+
+intrinsic OctadWithValuationData(Octad, VlIdeal) -> Any, Any
+	{ Apply a change of basis to an octad to make it have specific valuation data. }
+	pi := UniformizingElement(Universe(Octad[1]));
+	mn, ABCDidx := Min(Eltseq(VlIdeal));
+	assert mn eq 0;		/* Just to be safe :-) */
+
+	ABCD := KeySets[ABCDidx]; E := Min({1..8} diff ABCD); ABCDE := Setseq(ABCD) cat [E];
+	M5 := Matrix(Octad[ABCDE]);
+	K5 := KernelMatrix(M5); assert(Nrows(K5) eq 1);
+	N  := Matrix(4, 4, [ Octad[ABCDE[i],j] * K5[1,i] : i, j in [1..4] ]);
+
+	DiagVals := [Integers() | VlIdeal[Index(KeySets, Seqset(ABCDE) diff {ABCDE[i]})] : i in [1..4] ];
+
+	mx := Max(DiagVals);
+	N[1] *:= pi^(mx-DiagVals[1]);
+	N[2] *:= pi^(mx-DiagVals[2]);
+	N[3] *:= pi^(mx-DiagVals[3]);
+	N[4] *:= pi^(mx-DiagVals[4]);
+	OFinal := Matrix(Octad) * N^(-1);
+	OFinal := [ NormaliseValuation(OFinal[i]) : i in [1..8] ];
+	
+	assert PluckerValuations(OFinal) eq VlIdeal;
+
+	return OFinal, N;
+end intrinsic;

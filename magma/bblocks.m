@@ -60,13 +60,18 @@ intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
     return PlOctad, KeySets;
 end intrinsic;
 
-intrinsic PluckerValuations(PlOctad::SeqEnum : _Valuation := Valuation) -> ModTupFldElt
-    { On input of a plucker sequence, this function returns its 70-dimensional valuation vector }
+intrinsic PluckerValuations(PlOctad::SeqEnum[Any] : _Valuation := Valuation) -> ModTupFldElt
+    { On input a plucker sequence, return the valuation vector of rank 70. }
 
     w := V70![ _Valuation(pl) : pl in PlOctad];
     w := w - Min(Eltseq(w)) * Parent(w)![1 : i in [1..Rank(V70)]];
 
     return w;
+end intrinsic;
+
+intrinsic PluckerValuations(Octad::SeqEnum[SeqEnum[Any]] : _Valuation := Valuation) -> ModTupFldElt
+	{ On input a Cayley octad, return the valuation vector of rank 70. }
+	return PluckerValuations(PluckerCoordinates(Octad) : _Valuation := Valuation);
 end intrinsic;
 
 intrinsic TwistedCubicMultiplicity(O::SeqEnum) -> RngIntElt
