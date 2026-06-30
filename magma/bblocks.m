@@ -69,6 +69,30 @@ intrinsic PluckerValuations(PlOctad::SeqEnum : _Valuation := Valuation) -> ModTu
     return w;
 end intrinsic;
 
+intrinsic TwistedCubicMultiplicity(O::SeqEnum) -> RngIntElt
+	{ On input a Cayley octad or Plücker coordinates, returns the twisted cubic multiciplicity of the octad. }
+	Fpl := PolynomialRing( Rationals(), [ 1 : i in [1..70+1] ] );
+	pi := Fpl.71;
+	if #O eq 8 then
+		PlO := PluckerCoordinates(O);
+	elif #O eq 70 then
+		PlO := O;
+	else
+		assert(false);
+	end if;
+	VlO := PluckerValuations(PlO);
+	Pl := [ Fpl.i * pi^(Integers()!VlO[i]) : i in [1..70] ];
+	Tw := CayleyOctadTwistedCubicRelations(Pl);
+	TermDegrees :=  [ [Degree(T, pi) : T in Terms(E) ] : E in Tw ];
+	if { L[1] eq L[2] : L in TermDegrees } ne {true} then return 0; end if;
+	TV := Vector([ Degree(e, pi) : e in Tw ]);
+	TwO := CayleyOctadTwistedCubicRelations(PlO);
+	TVO := Vector([ Rationals() | Valuation(e) : e in TwO]);
+	DTV := TVO - TV;
+	vmin := Min(Eltseq(DTV));
+	return vmin;
+end intrinsic;
+
 function CayleyBuildingBlocks()
 
     TT := MyBenchStart(1, "Building Blocks Precomputations");
@@ -779,10 +803,16 @@ intrinsic GetBuildBlockIndexes(D::List, Dmult::SeqEnum, VlOctad::ModTupFldElt) -
     return ret;
 end intrinsic;
 
+intrinsic CayleyOctadDiagram(Octad::SeqEnum[SeqEnum[FldPadElt]] :
+                             UsefulThings := [**], BuildBlockIndexes := false, HideAuxiliaryBlocks := true) -> List, SeqEnum, Any, Any
+    {Compute an octad diagram from an octad.}
+    VlOctad := PluckerValuations(PluckerCoordinates(Octad));
+    return CayleyOctadDiagram(VlOctad : UsefulThings := UsefulThings, BuildBlockIndexes := BuildBlockIndexes, HideAuxiliaryBlocks := HideAuxiliaryBlocks);
+end intrinsic;
 
 intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :
                              UsefulThings := [**], BuildBlockIndexes := false, HideAuxiliaryBlocks := true) -> List, SeqEnum, Any, Any
-    {Compute an octad diagram}
+    {Compute an octad diagram from Plücker valuations.}
 
     TT := MyBenchStart(1, "Cayley Building Blocks");
 

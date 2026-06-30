@@ -273,31 +273,9 @@ intrinsic QuarticTypeFromOctad(f::RngMPolElt, p::RngIntElt :
                     if "Ln" in odiag then IsHyper := "Yes"; end if;
                 end if;
 
-                if true /* IsHyper eq "Unknown" */ then
-                    Fpl := PolynomialRing( Rationals(), [ 1 : i in [1..70+1] ] ); pi := Fpl.71;
+                TwCuMult := TwistedCubicMultiplicity(PGLPlOrb[k]);
 
-                    Pl := [ Fpl.i * pi^(Integers()!VlOctad[i]) : i in [1..70] ];
-                    Tw := CayleyOctadTwistedCubicRelations(Pl);
-
-                    TermDegrees :=  [ [Degree(T, pi) : T in Terms(E) ] : E in Tw ];
-                    if { L[1] eq L[2] : L in TermDegrees } ne {true} then IsHyper := "No"; end if;
-                end if;
-
-                if true /* IsHyper eq "Unknown" */ then
-                    TV := Vector([ Degree(e, pi) : e in Tw ]);
-                    vprintf G3Cayley, 1: "%o=> (Default) Twisted equation valuations are %o (homogeneous: %o)\n",
-                        MyBenchIndent(""), {* e : e in Eltseq(TV) *}, { L[1] eq L[2] : L in TermDegrees };
-
-                    TwO := CayleyOctadTwistedCubicRelations(PGLPlOrb[k]);
-                    TVO := Vector([ Rationals() | Valuation(e) : e in TwO]);
-                    vprintf G3Cayley, 1: "%o=> (Real) Twisted equation valuations are %o (diff = %o)\n",
-                        MyBenchIndent(""), {* e : e in Eltseq(TVO) *}, {* e : e in Eltseq(TVO-TV) *};
-
-                    DTV := TVO - TV;
-
-                    if Min(Eltseq(DTV)) gt 0 then IsHyper := "Yes"; end if;
-
-                end if;
+                if TwCuMult gt 0 then IsHyper := "Yes"; end if;
 
                 vprintf G3Cayley, 1: "%o=> Hyperelliptic reduction: %o\n", MyBenchIndent(""), IsHyper;
 
