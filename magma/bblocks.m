@@ -51,6 +51,8 @@ SymGrp := sub< GL(6,2) | [Matrix([nu(E3.i) : i in [1..6]]) : nu in SymGens] >;
 PermGens := [ hom< E3->E3 | x :-> rho( (Hom(V8,V8)!PermutationMatrix(GF(2), P)) (x @@ rho) ) > : P in {[2,1,3,4,5,6,7,8], [2,3,4,5,6,7,8,1]} ];
 PermGrp := sub< GL(6,2) | [Matrix([nu(E3.i) : i in [1..6]]) : nu in PermGens] >;
 CreAction := [Hom(E3,E3)!(M^(-1)) : M in Transversal(SymGrp, PermGrp)];
+E3Basis := [ V8!(v@@rho) : v in Basis(Image(rho)) ];
+E3Basis := [ {i : i in {1..8} | v[i] ne 0} : v in E3Basis ];
 
 intrinsic PluckerCoordinates(Octad::SeqEnum) -> SeqEnum, SeqEnum
     { On input of a Cayley octad, this function returns its 70-dimensional plucker vector and its corresponding ordered 4-partitions of \{1..8\} }
@@ -70,32 +72,32 @@ intrinsic PluckerValuations(PlOctad::SeqEnum[Any] : _Valuation := Valuation) -> 
 end intrinsic;
 
 intrinsic PluckerValuations(Octad::SeqEnum[SeqEnum[Any]] : _Valuation := Valuation) -> ModTupFldElt
-	{ On input a Cayley octad, return the valuation vector of rank 70. }
-	return PluckerValuations(PluckerCoordinates(Octad) : _Valuation := Valuation);
+    { On input a Cayley octad, return the valuation vector of rank 70. }
+    return PluckerValuations(PluckerCoordinates(Octad) : _Valuation := Valuation);
 end intrinsic;
 
 intrinsic TwistedCubicMultiplicity(O::SeqEnum) -> RngIntElt
-	{ On input a Cayley octad or Plücker coordinates, returns the twisted cubic multiciplicity of the octad. }
-	Fpl := PolynomialRing( Rationals(), [ 1 : i in [1..70+1] ] );
-	pi := Fpl.71;
-	if #O eq 8 then
-		PlO := PluckerCoordinates(O);
-	elif #O eq 70 then
-		PlO := O;
-	else
-		assert(false);
-	end if;
-	VlO := PluckerValuations(PlO);
-	Pl := [ Fpl.i * pi^(Integers()!VlO[i]) : i in [1..70] ];
-	Tw := CayleyOctadTwistedCubicRelations(Pl);
-	TermDegrees :=  [ [Degree(T, pi) : T in Terms(E) ] : E in Tw ];
-	if { L[1] eq L[2] : L in TermDegrees } ne {true} then return 0; end if;
-	TV := Vector([ Degree(e, pi) : e in Tw ]);
-	TwO := CayleyOctadTwistedCubicRelations(PlO);
-	TVO := Vector([ Rationals() | Valuation(e) : e in TwO]);
-	DTV := TVO - TV;
-	vmin := Min(Eltseq(DTV));
-	return vmin;
+    { On input a Cayley octad or Plücker coordinates, returns the twisted cubic multiciplicity of the octad. }
+    Fpl := PolynomialRing( Rationals(), [ 1 : i in [1..70+1] ] );
+    pi := Fpl.71;
+    if #O eq 8 then
+        PlO := PluckerCoordinates(O);
+    elif #O eq 70 then
+        PlO := O;
+    else
+        assert(false);
+    end if;
+    VlO := PluckerValuations(PlO);
+    Pl := [ Fpl.i * pi^(Integers()!VlO[i]) : i in [1..70] ];
+    Tw := CayleyOctadTwistedCubicRelations(Pl);
+    TermDegrees :=  [ [Degree(T, pi) : T in Terms(E) ] : E in Tw ];
+    if { L[1] eq L[2] : L in TermDegrees } ne {true} then return 0; end if;
+    TV := Vector([ Degree(e, pi) : e in Tw ]);
+    TwO := CayleyOctadTwistedCubicRelations(PlO);
+    TVO := Vector([ Rationals() | Valuation(e) : e in TwO]);
+    DTV := TVO - TV;
+    vmin := Min(Eltseq(DTV));
+    return vmin;
 end intrinsic;
 
 function CayleyBuildingBlocks()
@@ -473,7 +475,7 @@ function Act(M, V)
 end function;
 
 intrinsic DiagramAction(D::List, M::ModMatFldElt : SetsInsteadOfPairs := false) -> List
-    {  Apply a Cremona transform to an octad picture }
+    {  Cremona transform of an octad picture }
 
     V := [* AssociatedSubspace(d) : d in D *];
     if SetsInsteadOfPairs then
@@ -481,6 +483,30 @@ intrinsic DiagramAction(D::List, M::ModMatFldElt : SetsInsteadOfPairs := false) 
     end if;
     return [* AssociatedBlock(Act(M,v) : SetsInsteadOfPairs := SetsInsteadOfPairs) : v in V *];
 
+end intrinsic;
+
+function CremonaMatrix(S)
+    BasisImage := [];
+    SComp := {1..8} diff S;
+    for T in E3Basis do
+        Signature := { #(T meet S), #(T meet SComp) };
+        if #(T meet S) mod 2 eq 0 then
+            Append(~BasisImage, rho(&+[V8.i : i in T]));
+        else
+            Append(~BasisImage, rho(&+[V8.i : i in (T diff S) join (S diff T)]));
+        end if;
+    end for;
+    return Hom(Image(rho),Image(rho))!hom< Image(rho)->Image(rho) | BasisImage >;
+end function;
+
+CremonaMatrixArr := AssociativeArray();
+for S in Subsets({1..8}, 4) do
+    CremonaMatrixArr[S] := CremonaMatrix(S);
+end for;
+
+intrinsic CremonaAction(D::List, S::SetEnum)->List
+{ Cremona transform of an octad picture }
+    return DiagramAction(D, CremonaMatrixArr[Set(S)]);
 end intrinsic;
 
 function MinimalS8Representative(D)
@@ -811,8 +837,14 @@ end intrinsic;
 intrinsic CayleyOctadDiagram(Octad::SeqEnum[SeqEnum[FldPadElt]] :
                              UsefulThings := [**], BuildBlockIndexes := false, HideAuxiliaryBlocks := true) -> List, SeqEnum, Any, Any
     {Compute an octad diagram from an octad.}
-    VlOctad := PluckerValuations(PluckerCoordinates(Octad));
-    return CayleyOctadDiagram(VlOctad : UsefulThings := UsefulThings, BuildBlockIndexes := BuildBlockIndexes, HideAuxiliaryBlocks := HideAuxiliaryBlocks);
+    VlOctad := NormaliseValuationData(PluckerValuations(PluckerCoordinates(Octad)));
+    D, DmultS, Blocks, IsCompatible := CayleyOctadDiagram(VlOctad : UsefulThings := UsefulThings, BuildBlockIndexes := BuildBlockIndexes, HideAuxiliaryBlocks := HideAuxiliaryBlocks);
+    c := TwistedCubicMultiplicity(Octad);
+    if c gt 0 then
+        Append(~D, <"TCu", {}>);
+        Append(~DmultS, c);
+    end if;
+    return D, DmultS, Blocks, IsCompatible;
 end intrinsic;
 
 intrinsic CayleyOctadDiagram(VlOctad::ModTupFldElt :

@@ -136,6 +136,7 @@ function pAdicGCD(mindeg, _p1, _p2 : LPrate := 10)
 
 	/* A dichotomic search */
 	res := Parent(p1)!0;
+	prec := hprec;
 	while (hprec -lprec) gt gap do
 
 		prec := (hprec + lprec) div 2;
@@ -788,30 +789,23 @@ intrinsic NormaliseValuationData(v1::ModTupFldElt : S := {1,2,3,4,5}, Permute :=
 	return v3;
 end intrinsic;
 
+intrinsic CremonaAction(Octad::SeqEnum[SeqEnum[Any]], S::SetEnum)->Any
+{ Cremona transform of a Cayley octad }
+	L := Sort(Setseq({1..8} diff S)) cat Sort(Setseq(S));
+	_O := NormaliseOctad(Octad[L]);
+	for i := 5 to 8 do
+		_O[i, 1] := 1 / _O[i, 1];
+		_O[i, 2] := 1 / _O[i, 2];
+		_O[i, 3] := 1 / _O[i, 3];
+		_O[i, 4] := 1 / _O[i, 4];
+	end for;
+	return N where N := NormaliseOctad([ _O[Index(L, i)] : i in [1..8 ] ]);
+end intrinsic;
+
 intrinsic CayleyOctadCremonaOrbit(Octad::SeqEnum) -> SeqEnum
 	{Orbit of an octad under Cremona action, restricted to octads in standard position}
-
-	Indexes := {};
-	for S in Subsets({1..8}, 4) do
-		if ({1..8} diff S) in Indexes then continue; end if;
-		Include(~Indexes, S);
-	end for;
-	Indexes := Sort([ Sort(Setseq(E)) : E in Indexes ]);
-
-	CremonaOrbit := [ NormaliseOctad(Octad) ];
-	for S in Indexes do
-		L := Sort(Sort(Setseq({1..8} diff Seqset(S)))) cat S;
-		_O := NormaliseOctad(Octad[L]);
-		for i := 5 to 8 do
-			_O[i, 1] := 1 / _O[i, 1];
-			_O[i, 2] := 1 / _O[i, 2];
-			_O[i, 3] := 1 / _O[i, 3];
-			_O[i, 4] := 1 / _O[i, 4];
-		end for;
-		Append(~CremonaOrbit, NormaliseOctad(_O));
-	end for;
-
-	return CremonaOrbit;
+	Indices := Sort([ Sort(Setseq(E)) : E in Subsets({1..7}, 4) ]);
+	return [ NormaliseOctad(Octad) ] cat [ CremonaAction(Octad, S) : S in Indices ];
 end intrinsic;
 
 intrinsic OctadWithValuationData(Octad, VlIdeal) -> Any, Any
