@@ -4,7 +4,7 @@
   loctad.m
   bblocks.m
   g3thetas.m
-  models.m
+  examplecurves.m
   reduction.m
   octadgeometry.m
   utilities.m
