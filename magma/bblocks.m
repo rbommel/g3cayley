@@ -100,6 +100,160 @@ intrinsic TwistedCubicMultiplicity(O::SeqEnum) -> RngIntElt
     return vmin;
 end intrinsic;
 
+intrinsic CayleyOctadBlock(type::MonStgElt, s::Any) -> ModTupFldElt
+    { This function computes the valuation vector corresponding to a Cayley octad building block.
+      Type is a string indicating the type (e.g. "alpha1b") and s indicates the indices on the block (e.g. Set([1,2,3,5,6,8])). }
+    v := AssociativeArray(); for i := 1 to #KeySets do v[KeySets[i]] := V70.i; end for;
+    case type:
+    when "alpha1a":
+        try
+            assert (s subset {1..8}) and (#s eq 2);
+        catch e
+            error "Index set for block alpha1a has to be of the shape {1,2}";
+        end try;
+        return &+[v[t] : t in KeySets | s subset t];
+    when "alpha1b":
+        try
+            assert (s subset {1..8}) and (#s eq 2);
+        catch e
+            error "Index set for block alpha1a has to be of the shape {1,2}";
+        end try;
+        return &+[v[t] : t in KeySets | #(s meet t) eq 0];
+    when "alpha2a":
+        try
+            assert (s subset {1..8}) and (#s eq 4);
+        catch e
+            error "Index set for block alpha2a has to be of the shape {1,2,3,4}";
+        end try;
+        return  v[s] + v[{1..8} diff s];
+    when "alpha2b":
+        try
+            assert (s subset {1..8}) and (#s eq 4);
+        catch e
+            error "Index set for block alpha2b has to be of the shape {1,2,3,4}";
+        end try;
+        return &+[v[t] : t in KeySets | #(s meet t) eq 2] + 
+               2*&+[v[t] : t in KeySets | #(s meet t) eq 3] + 4*v[s];
+    when "chi1a":
+        try
+            assert (s[1] subset {1..8}) and (s[2] subset {1..8}) and ({#t : t in s} eq {3});
+        catch e
+            error "Index set for block chi1a has to be of the shape <{1,2,3},{4,5,6}>";
+        end try;
+        return &+[v[t] : t in Subsets(s[1] join s[2], 4)] + 
+               &+[v[{x} join y] : x in {1..8} diff s[1] diff s[2], y in s];
+    when "chi1b":
+        try
+            assert (s[1] subset {1..8}) and (s[2] subset {1..8}) and ({#t : t in s} eq {3});
+        catch e
+            error "Index set for block chi1b has to be of the shape <{1,2,3},{4,5,6}>";
+        end try;
+        return &+[v[t] : t in Subsets({1..8}, 4) | #(t meet (s[1] join s[2])) eq 2] + 
+               &+[v[{x} join y] : x in {1..8} diff s[1] diff s[2], y in s];
+    when "chi1c":
+        try
+            assert (s[1] subset {1..8}) and (s[2] subset {1..8}) and ({#t : t in s} eq {3});
+        catch e
+            error "Index set for block chi1c has to be of the shape <{1,2,3},{4,5,6}>";
+        end try;
+        r := {1..8} diff s[1] diff s[2];
+        return &+[v[t] : t in Subsets({1..8}, 4) | #(s[1] meet t) eq 2] +
+                2*&+[v[t] : t in Subsets({1..8}, 4) | s[1] subset t] +
+                &+[v[t] : t in Subsets(r join s[1], 4)] +
+                &+[v[r join {a,b}] : a in s[1], b in s[2]];
+    when "chi2a":
+        try
+            assert (s subset {1..8}) and (#s eq 3);
+        catch e
+            error "Index set for block chi2a has to be of the shape {1,2,3}";
+        end try;
+        return &+[ &+[ v[t] : t in KeySets | #(t meet ({1..8} diff s join {x})) eq 4 ]  : x in s];   
+    when "chi2b":
+        try
+            assert (s subset {1..8}) and (#s eq 3);
+        catch e
+            error "Index set for block chi2b has to be of the shape {1,2,3}";
+        end try;
+        return &+[v[s join {i}] : i in {1..8} diff s] +
+               &+[ (#(t meet s) - 1)*v[t] : t in KeySets | #(t meet s) ge 2 ];
+    when "chi2c":
+        try
+            assert (s subset {1..8}) and (#s eq 3);
+        catch e
+            error "Index set for block chi2c has to be of the shape {1,2,3}";
+        end try;
+        r := {1..8} diff s;
+        return &+[v[s join {i}] : i in r] +
+               &+[v[t] : t in Subsets(r, 4)];
+    when "phi1a":
+        try
+            assert (#s eq 4) and {t subset {1..8} and #t eq 2 : t in [s[i] : i in [1..4]]} eq {true};
+        catch e
+            error "Index set for block phi1a has to be of the shape <{1,2},{3,4},{5,6},{7,8}>";
+        end try;
+        return CayleyOctadBlock("Line", s[1] join s[3]) +
+               CayleyOctadBlock("Line", s[1] join s[4]) +
+               CayleyOctadBlock("alpha2a", s[1] join s[2]);
+    when "phi1b":
+        try
+            assert (#s eq 4) and {t subset {1..8} and #t eq 2 : t in [s[i] : i in [1..4]]} eq {true};
+        catch e
+            error "Index set for block phi1b has to be of the shape <{1,2},{3,4},{5,6},{7,8}>";
+        end try;
+        return &+[ &+[v[t] : t in KeySets | y subset t] : y in [s[1], s[2]]] +
+               &+[ v[t] : t in KeySets | { #(t meet y) : y in [s[1],s[2]] } eq {1} and { #(t meet y) : y in [s[3],s[4]] } eq {0,2} ];
+    when "phi2a":
+        try
+            assert (s[1] subset {1..8}) and (s[2] subset {1..8}) and ({#t : t in s} eq {3});
+        catch e
+            error "Index set for block phi2a has to be of the shape <{1,2,3},{4,5,6}>";
+        end try;
+        return &+[v[t] : t in KeySets | { #(t meet v) : v in {s[1],s[2]} } eq {1,3} ] +
+               &+[ &+[v[t] : t in Subsets(y join ({1..8} diff s[1] diff s[2]),4) ] : y in {s[1],s[2]}];
+    when "phi2b":
+        try
+            assert (s[1] subset {1..8}) and (s[2] subset {1..8}) and ({#t : t in s} eq {3});
+        catch e
+            error "Index set for block phi2b has to be of the shape <{1,2,3},{4,5,6}>";
+        end try;
+        r := {1..8} diff s[1] diff s[2];
+        return CayleyOctadBlock("alpha1a", r) + &+[CayleyOctadBlock("Line", s[1] join {x}) : x in r];
+    when "phi2c":
+        try
+            assert (s[1] subset {1..8}) and (s[2] subset {1..8}) and ({#t : t in s} eq {3});
+        catch e
+            error "Index set for block phi2c has to be of the shape <{1,2,3},{4,5,6}>";
+        end try;
+        r := {1..8} diff s[1] diff s[2];
+        return CayleyOctadBlock("alpha1b", r) + &+[CayleyOctadBlock("Line", s[1] join {x}) : x in r];
+    when "phi3a":
+        try
+            assert (s subset {1..8}) and (#s eq 4);
+        catch e
+            error "Index set for block phi3a has to be of the shape {1,2,3,4}";
+        end try;
+        return CayleyOctadBlock("alpha2a", s) + CayleyOctadBlock("Line", s);
+    when "phi3b":
+        try
+            assert (s subset {1..8}) and (#s eq 4);
+        catch e
+            error "Index set for block phi3b has to be of the shape {1,2,3,4}";
+        end try;
+        return CayleyOctadBlock("alpha2b", s) + CayleyOctadBlock("Line", s);
+    //when "TCu":
+        
+    when "Line":
+        try
+            assert (s subset {1..8}) and (#s eq 4);
+        catch e
+            error "Index set for block Line has to be of the shape {1,2,3,4}";
+        end try;
+        return &+[v[t] : t in KeySets | #(t meet s) eq 3] + 2*v[s];
+    else:
+        error "Type unknown";
+    end case;
+end intrinsic;
+
 function CayleyBuildingBlocks()
 
     TT := MyBenchStart(1, "Building Blocks Precomputations");
@@ -128,8 +282,8 @@ function CayleyBuildingBlocks()
     for s in Subsets({1..8}, 2) do
         va := &+[v[t] : t in KeySets | s subset t];
         vb := &+[v[t] : t in KeySets | #(s meet t) eq 0];
-        assert va in W;
-        assert vb in W;
+        assert va in W and va eq CayleyOctadBlock("alpha1a", s);
+        assert vb in W and vb eq CayleyOctadBlock("alpha1b", s);
         Tw[s] := [va, vb];
         Append(~Things, <"Tw", s>);
     end for;
@@ -147,9 +301,10 @@ function CayleyBuildingBlocks()
             vv :=
                 &+[v[t] : t in KeySets | #(s2 meet t) eq 2] +
                 2*&+[v[t] : t in KeySets | #(s2 meet t) eq 3] + 4*v[s2];
+            assert vv eq CayleyOctadBlock("alpha2b", s2);
             Append(~vb, vv);
         end for;
-        assert va in W;
+        assert va in W and va eq CayleyOctadBlock("alpha2a", Random(s));
         assert vb[1] in W;
         assert vb[2] in W;
         Pl[s] := [va] cat vb;
@@ -178,9 +333,10 @@ function CayleyBuildingBlocks()
                 &+[v[t] : t in Subsets(s[1] join x, 4)] +
                 &+[v[s[1] join {a,b}] : a in x, b in y];
             Append(~vc, vv);
+            assert vv eq CayleyOctadBlock("chi1c", <x,y>);
         end for;
-        assert va in W;
-        assert vb in W;
+        assert va in W and va eq CayleyOctadBlock("chi1a", <t : t in s[2]>);
+        assert vb in W and vb eq CayleyOctadBlock("chi1b", <t : t in s[2]>);
         assert vc[1] in W;
         assert vc[2] in W;
         TA[s] := [va, vb] cat vc;
@@ -202,9 +358,9 @@ function CayleyBuildingBlocks()
         vc :=
             &+[v[s join {i}] : i in r] +
             &+[v[t] : t in Subsets(r, 4)];
-        assert va in W;
-        assert vb in W;
-        assert vc in W;
+        assert va in W and va eq CayleyOctadBlock("chi2a", s);
+        assert vb in W and vb eq CayleyOctadBlock("chi2b", s);;
+        assert vc in W and vc eq CayleyOctadBlock("chi2c", s);;
         TB[s] := [va, vb, vc];
         Append(~Things, <"TB", s>);
     end for;
@@ -232,6 +388,7 @@ function CayleyBuildingBlocks()
                 &+[ v[t] : t in KeySets | { #(t meet y) : y in x } eq {1} and { #(t meet y) : y in x2 } eq {0, 2} ];
             assert vvb in W;
             Append(~vb, vvb);
+            assert vvb eq CayleyOctadBlock("phi1b", <t : t in x> cat <t : t in x2>);
             for y in x do
                 y2 := [z : z in x | z ne y][1];
                 vva :=
@@ -240,6 +397,7 @@ function CayleyBuildingBlocks()
                     &+[v[t] : t in KeySets | #(t meet y) eq 1 and #(t meet y2) eq 1 and { #(t meet z) : z in x2 } eq {0, 2} ] ;
                 assert vva in W;
                 Append(~va, vva);
+                assert vva eq CayleyOctadBlock("phi1a", <y, y2> cat <t : t in x2>);
             end for;
         end for;
         CA[s] := va cat vb;
@@ -272,9 +430,11 @@ function CayleyBuildingBlocks()
                 &+[v[t] : t in Subsets(x join s[1], 4)];
             assert vvc in W;
             Append(~vb, vvb);
+            assert vvb eq CayleyOctadBlock("phi2b", <x,y>);
             Append(~vc, vvc);
+            assert vvc eq CayleyOctadBlock("phi2c", <x,y>);
         end for;
-        assert va in W;
+        assert va in W and va eq CayleyOctadBlock("phi2a", <t : t in s[2]>);;
         CB[s] := [va] cat vb cat vc;
         Append(~Things, <"CB", s>);
     end for;
@@ -300,7 +460,9 @@ function CayleyBuildingBlocks()
                 2*v[x];
             assert vvb in W;
             Append(~va, vva);
+            assert vva eq CayleyOctadBlock("phi3a", x);
             Append(~vb, vvb);
+            assert vvb eq CayleyOctadBlock("phi3b", x);
         end for;
         CC[s] := va cat vb;
         Append(~Things, <"CC", s>);
@@ -319,6 +481,7 @@ function CayleyBuildingBlocks()
                 2*v[x];
             assert(vva in W);
             Append(~va, vva);
+            assert vva eq CayleyOctadBlock("Line", x);
         end for;
         for i in [1..8] do
             // 7 points on a plane with 3 colliding
