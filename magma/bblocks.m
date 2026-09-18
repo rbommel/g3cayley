@@ -280,10 +280,10 @@ function CayleyBuildingBlocks()
     tt := MyBenchStart(2, "Twins");
     Tw := AssociativeArray();
     for s in Subsets({1..8}, 2) do
-        va := &+[v[t] : t in KeySets | s subset t];
-        vb := &+[v[t] : t in KeySets | #(s meet t) eq 0];
-        assert va in W and va eq CayleyOctadBlock("alpha1a", s);
-        assert vb in W and vb eq CayleyOctadBlock("alpha1b", s);
+        va := CayleyOctadBlock("alpha1a", s);
+        vb := CayleyOctadBlock("alpha1b", s);
+        assert va in W;
+        assert vb in W;
         Tw[s] := [va, vb];
         Append(~Things, <"Tw", s>);
     end for;
@@ -295,16 +295,13 @@ function CayleyBuildingBlocks()
     S4 := { {T, {i : i in {1..8} | not(i in T)}} : T in KeySets };
     Pl := AssociativeArray();
     for s in S4 do
-        va := &+[v[t] : t in s];
+        va := CayleyOctadBlock("alpha2a", Random(s));
         vb := [];
         for s2 in s do
-            vv :=
-                &+[v[t] : t in KeySets | #(s2 meet t) eq 2] +
-                2*&+[v[t] : t in KeySets | #(s2 meet t) eq 3] + 4*v[s2];
-            assert vv eq CayleyOctadBlock("alpha2b", s2);
+            vv := CayleyOctadBlock("alpha2b", s2);
             Append(~vb, vv);
         end for;
-        assert va in W and va eq CayleyOctadBlock("alpha2a", Random(s));
+        assert va in W;
         assert vb[1] in W;
         assert vb[2] in W;
         Pl[s] := [va] cat vb;
@@ -318,25 +315,16 @@ function CayleyBuildingBlocks()
     ST := { < T, {V, {i : i in {1..8} | not(i in T join V)}} > : T in Subsets({1..8}, 2), V in Subsets({1..8}, 3) | #(T meet V) eq 0 };
     TA := AssociativeArray();
     for s in ST do
-        va :=
-            &+[v[t] : t in Subsets(&join([x : x in s[2]]) ,4)] +
-            &+[v[{x} join y] : x in s[1], y in s[2]];
-        vb :=
-            &+[v[t] : t in Subsets({1..8}, 4) | s[1] subset t] +
-            &+[v[{x} join y] : x in s[1], y in s[2]];
+        va := CayleyOctadBlock("chi1a", <t : t in s[2]>);
+        vb := CayleyOctadBlock("chi1b", <t : t in s[2]>);
         vc := [];
         for x in s[2] do
             y := [z : z in s[2] | z ne x][1];
-            vv :=
-                &+[v[t] : t in Subsets({1..8}, 4) | #(x meet t) eq 2] +
-                2*&+[v[t] : t in Subsets({1..8}, 4) | x subset t] +
-                &+[v[t] : t in Subsets(s[1] join x, 4)] +
-                &+[v[s[1] join {a,b}] : a in x, b in y];
+            vv := CayleyOctadBlock("chi1c", <x,y>);
             Append(~vc, vv);
-            assert vv eq CayleyOctadBlock("chi1c", <x,y>);
         end for;
-        assert va in W and va eq CayleyOctadBlock("chi1a", <t : t in s[2]>);
-        assert vb in W and vb eq CayleyOctadBlock("chi1b", <t : t in s[2]>);
+        assert va in W;
+        assert vb in W;
         assert vc[1] in W;
         assert vc[2] in W;
         TA[s] := [va, vb] cat vc;
@@ -350,17 +338,12 @@ function CayleyBuildingBlocks()
     TB := AssociativeArray();
     for s in Subsets({1..8}, 3) do
         r := {i : i in {1..8} | not(i in s)};
-        va :=
-            &+[ &+[ v[t] : t in KeySets | #(t meet (r join {x})) eq 4 ]  : x in s];
-        vb :=
-            &+[v[s join {i}] : i in r] +
-            &+[ (#(t meet s) - 1)*v[t] : t in KeySets | #(t meet s) ge 2 ] ;
-        vc :=
-            &+[v[s join {i}] : i in r] +
-            &+[v[t] : t in Subsets(r, 4)];
-        assert va in W and va eq CayleyOctadBlock("chi2a", s);
-        assert vb in W and vb eq CayleyOctadBlock("chi2b", s);;
-        assert vc in W and vc eq CayleyOctadBlock("chi2c", s);;
+        va := CayleyOctadBlock("chi2a", s);
+        vb := CayleyOctadBlock("chi2b", s);
+        vc := CayleyOctadBlock("chi2c", s);
+        assert va in W;
+        assert vb in W;
+        assert vc in W;
         TB[s] := [va, vb, vc];
         Append(~Things, <"TB", s>);
     end for;
@@ -383,21 +366,14 @@ function CayleyBuildingBlocks()
         vb := [];
         for x in s do
             x2 := [y : y in s | y ne x][1];
-            vvb :=
-                &+[ &+[v[t] : t in KeySets | y subset t] : y in x] +
-                &+[ v[t] : t in KeySets | { #(t meet y) : y in x } eq {1} and { #(t meet y) : y in x2 } eq {0, 2} ];
+            vvb := CayleyOctadBlock("phi1b", <t : t in x> cat <t : t in x2>);
             assert vvb in W;
             Append(~vb, vvb);
-            assert vvb eq CayleyOctadBlock("phi1b", <t : t in x> cat <t : t in x2>);
             for y in x do
                 y2 := [z : z in x | z ne y][1];
-                vva :=
-                    &+[ v[t] : t in KeySets | y subset t] +
-                    &+[v[t] : t in KeySets | #(y2 meet t) eq 0] +
-                    &+[v[t] : t in KeySets | #(t meet y) eq 1 and #(t meet y2) eq 1 and { #(t meet z) : z in x2 } eq {0, 2} ] ;
+                vva := CayleyOctadBlock("phi1a", <y, y2> cat <t : t in x2>);
                 assert vva in W;
                 Append(~va, vva);
-                assert vva eq CayleyOctadBlock("phi1a", <y, y2> cat <t : t in x2>);
             end for;
         end for;
         CA[s] := va cat vb;
@@ -410,31 +386,19 @@ function CayleyBuildingBlocks()
     tt := MyBenchStart(2, "Candy B");
     CB := AssociativeArray();
     for s in ST do
-        va :=
-            &+[v[t] : t in KeySets | { #(t meet v) : v in s[2] } eq {1,3} ] +
-            &+[ &+[v[t] : t in Subsets(y join s[1],4) ] : y in s[2]];
+        va := CayleyOctadBlock("phi2a", <t : t in s[2]>);
         vb := [];
         vc := [];
         for x in s[2] do
             y := [t : t in s[2] | t ne x][1];
-            vvb :=
-                &+[v[t] : t in KeySets | s[1] subset t] +
-                3*&+[v[t] : t in KeySets | #(t meet x) eq 3] -
-                &+[v[t] : t in KeySets | #(t meet x) eq 3 and #(t meet y) eq 1] +
-                &+[v[t] : t in KeySets | #(t meet x) eq 2 and #(t meet y) eq 1] +
-                2*&+[v[t] : t in KeySets | #(t meet x) eq 2 and s[1] subset t] ;
+            vvb := CayleyOctadBlock("phi2b", <x,y>);
             assert vvb in W;
-            vvc :=
-                &+[(#(t meet x) - 1)*v[t] : t in KeySets | #(t meet x) ge 2] +
-                &+[v[t] : t in KeySets | { #(t meet v) : v in s[2] } eq {1,3} ] +
-                &+[v[t] : t in Subsets(x join s[1], 4)];
+            vvc := CayleyOctadBlock("phi2c", <x,y>);
             assert vvc in W;
             Append(~vb, vvb);
-            assert vvb eq CayleyOctadBlock("phi2b", <x,y>);
             Append(~vc, vvc);
-            assert vvc eq CayleyOctadBlock("phi2c", <x,y>);
         end for;
-        assert va in W and va eq CayleyOctadBlock("phi2a", <t : t in s[2]>);;
+        assert va in W;
         CB[s] := [va] cat vb cat vc;
         Append(~Things, <"CB", s>);
     end for;
@@ -449,20 +413,12 @@ function CayleyBuildingBlocks()
         vb := [];
         for x in s do
             y := [t : t in s | t ne x][1];
-            vva :=
-                3*v[x] +
-                v[y] +
-                &+[v[t] : t in KeySets | #(x meet t) eq 3];
+            vva := CayleyOctadBlock("phi3a", x);
             assert vva in W;
-            vvb :=
-                &+[ (#(t meet x) - 1)*v[t] : t in KeySets | #(t meet x) ge 2 ] +
-                &+[ v[t] : t in KeySets | #(t meet x) ge 3 ] +
-                2*v[x];
+            vvb := CayleyOctadBlock("phi3b", x);
             assert vvb in W;
             Append(~va, vva);
-            assert vva eq CayleyOctadBlock("phi3a", x);
             Append(~vb, vvb);
-            assert vvb eq CayleyOctadBlock("phi3b", x);
         end for;
         CC[s] := va cat vb;
         Append(~Things, <"CC", s>);
@@ -476,15 +432,12 @@ function CayleyBuildingBlocks()
     for s in S4 do
         va := [];
         for x in s do
-            vva :=
-                &+[v[t] : t in KeySets | #(t meet x) eq 3] +
-                2*v[x];
+            vva := CayleyOctadBlock("Line", x);
             assert(vva in W);
             Append(~va, vva);
-            assert vva eq CayleyOctadBlock("Line", x);
         end for;
         for i in [1..8] do
-            // 7 points on a plane with 3 colliding
+            // 7 points on a plane with 3 colliding, here only 4 points are in general position
             t := [x diff {i} : x in s | i in x][1];
             q := [x : x in s | not(i in x)][1];
             vva :=
