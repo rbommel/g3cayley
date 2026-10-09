@@ -7,8 +7,7 @@
   examplecurves.m
   reduction.m
   octadgeometry.m
-  utilities.m
-
+  #utilities.m
   singularities
   {
     +singularities.spec
