@@ -58,7 +58,7 @@ function MainComponentOctads(Octad : Diagram := 0, Multiplicities := 0)
 		when "CA":
 			assert(false); // Phi case still to be implemented. Requires special care.
 		when "Ln":
-			assert(false); // Line case still to be implemented. Requires special care.
+			AddToAllEntries(~TargetValuationData, Multiplicities[i] * CayleyOctadBlock("Line", Random(B[2]))); // Line case still to be implemented. Requires special care.
 		else:
 			assert(false);
 		end case;
