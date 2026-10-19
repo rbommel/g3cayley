@@ -56,15 +56,28 @@ function MainComponentOctads(Octad : Diagram := 0, Multiplicities := 0)
 		when "TA":
 			AddToAllEntries(~TargetValuationData, Multiplicities[i] * CayleyOctadBlock("chi1b", <S : S in B[2,2]>));
 		when "CA":
-			assert(false); // Phi case still to be implemented. Requires special care.
+			assert #TargetValuationData eq 1;
+			TargetValuationData := [TargetValuationData[1] + Multiplicities[i] * CayleyOctadBlock("phi1b", <S : S in Q[1] > cat <S : S in Q[2]>) : Q in Permutations(B[2])];
 		when "Ln":
-			AddToAllEntries(~TargetValuationData, Multiplicities[i] * CayleyOctadBlock("Line", Random(B[2]))); // Line case still to be implemented. Requires special care.
+			AddToAllEntries(~TargetValuationData, Multiplicities[i] * CayleyOctadBlock("Line", Random(B[2]))); // Line case still to be fully implemented. Requires special care.
 		else:
 			assert(false);
 		end case;
 	end for;
-	OutputOctads := [OctadWithValuationData(Octad, v) : v in TargetValuationData];
-	return OutputOctads, Diagram, Multiplicities;
+	OutputOctads := [];
+	TransformationMatrices := [IdentityMatrix(Universe(Octad[1]), 4)];
+	for i->v in TargetValuationData do
+		if i eq 1 then
+			Octad := OctadWithValuationData(Octad, v);
+			ABC := ABCFromOctad(Octad);
+			Append(~OutputOctads, Octad);
+		else
+			SecondOctad, M := OctadWithValuationData(Octad, v);
+			Append(~OutputOctads, SecondOctad);
+			Append(~TransformationMatrices, M);
+		end if;
+	end for;
+	return OutputOctads, Diagram, Multiplicities, TransformationMatrices;
 end function;
 
 function NormalisedDeterminantalModel(ONrm : ABC := 0)
